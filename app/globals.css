@@ -29,18 +29,18 @@ header {
 
 /* Padding para secciones - evita que se corten los títulos */
 section[id] {
-  scroll-margin-top: 4rem; /* 64px para móvil */
+  scroll-margin-top: 5.5rem; /* 88px para móvil - más grande */
 }
 
 @media (min-width: 768px) {
   section[id] {
-    scroll-margin-top: 4.5rem; /* 72px para tablet */
+    scroll-margin-top: 5.5rem; /* 88px para tablet */
   }
 }
 
 @media (min-width: 1024px) {
   section[id] {
-    scroll-margin-top: 5rem; /* 80px para desktop */
+    scroll-margin-top: 6rem; /* 96px para desktop */
   }
 }
 

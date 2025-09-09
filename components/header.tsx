@@ -52,7 +52,7 @@ export default function Header() {
                 alt="PJ Parsons Presents - Your Day, Your Way"
                 width={64}
                 height={64}
-                className="h-8 md:h-10 lg:h-12 w-auto object-contain hover:opacity-90 transition-opacity duration-300"
+                className="h-12 md:h-14 lg:h-16 w-auto object-contain hover:opacity-90 transition-opacity duration-300"
                 priority
               />
             </motion.a>
