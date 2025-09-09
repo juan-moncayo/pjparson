@@ -33,30 +33,25 @@ export default function Header() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center py-3">
-          {/* Logo elegante con hover solo en texto */}
+          {/* Logo con imagen */}
           <motion.div
             className="relative"
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.3, duration: 0.8 }}
           >
-            <div className="text-left">
-              <motion.h1 
-                className="text-lg md:text-xl lg:text-2xl font-serif font-bold text-gray-800 tracking-tight hover:text-primary transition-colors duration-300 cursor-pointer"
-                whileHover={{ scale: 1.02 }}
-                transition={{ duration: 0.2 }}
-              >
-                PJ Parsons Presents
-              </motion.h1>
-              <motion.p
-                className="text-xs md:text-sm text-gray-600 font-serif italic hover:text-secondary transition-colors duration-300"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.5, duration: 0.8 }}
-              >
-                Your Day, Your Way
-              </motion.p>
-            </div>
+            <motion.a
+              href="#home"
+              className="block"
+              whileHover={{ scale: 1.02 }}
+              transition={{ duration: 0.2 }}
+            >
+              <img
+                src="/pj.png"
+                alt="PJ Parsons Presents - Your Day, Your Way"
+                className="h-12 md:h-14 lg:h-16 w-auto object-contain hover:opacity-90 transition-opacity duration-300"
+              />
+            </motion.a>
           </motion.div>
 
           {/* Desktop Navigation */}
@@ -108,7 +103,7 @@ export default function Header() {
               whileHover={{ scale: 1.05, y: -2 }}
               whileTap={{ scale: 0.98 }}
             >
-              <span className="relative z-10 font-medium">Get Your Quote</span>
+              <span className="relative z-10 font-medium">Book Now</span>
               
               {/* Efecto de brillo */}
               <motion.div
@@ -211,7 +206,7 @@ export default function Header() {
                       }, 100);
                     }}
                   >
-                    Get Your Quote
+                    Book Now
                   </a>
                 </motion.div>
               </div>

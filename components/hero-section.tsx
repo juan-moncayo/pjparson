@@ -20,18 +20,14 @@ export default function HeroSection() {
 
   return (
     <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      {/* Video Background */}
+      {/* Image Background */}
       <div className="absolute inset-0 w-full h-full">
         {isClient && (
-          <video
-            autoPlay
-            muted
-            loop
-            playsInline
+          <img
+            src="/hero.jpg"
+            alt="Wedding and event background"
             className="w-full h-full object-cover"
-          >
-            <source src="/hero-video.mp4" type="video/mp4" />
-          </video>
+          />
         )}
         
         {/* Overlay elegante */}

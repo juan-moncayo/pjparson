@@ -109,12 +109,12 @@ const InstagramPost = ({ imageUrl, likes, comments, caption, delay }: InstagramP
         >
           <div className="text-white text-center p-4">
             <div className="flex justify-center space-x-6 mb-3">
-              <div className="flex items-center space-x-1">
-                <Heart className="h-5 w-5" />
+              <div className="flex items-center space-x-2">
+                <Heart className="h-5 w-5 text-red-500" />
                 <span className="font-medium">{likes}</span>
               </div>
-              <div className="flex items-center space-x-1">
-                <MessageCircle className="h-5 w-5" />
+              <div className="flex items-center space-x-2">
+                <MessageCircle className="h-5 w-5 text-blue-500" />
                 <span className="font-medium">{comments}</span>
               </div>
             </div>
@@ -124,7 +124,9 @@ const InstagramPost = ({ imageUrl, likes, comments, caption, delay }: InstagramP
 
         {/* Instagram icon overlay */}
         <div className="absolute top-3 right-3">
-          <Instagram className="h-5 w-5 text-white opacity-80" />
+          <div className="w-8 h-8 bg-gradient-to-r from-pink-500 to-purple-600 rounded-lg flex items-center justify-center shadow-lg">
+            <Instagram className="h-4 w-4 text-white" />
+          </div>
         </div>
       </div>
     </motion.div>
@@ -140,13 +142,15 @@ export default function InstagramSection() {
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16">
           <motion.div
-            className="flex items-center justify-center mb-4"
+            className="flex items-center justify-center mb-6"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
             viewport={{ once: true }}
           >
-            <Instagram className="h-6 w-6 mr-2 text-primary" />
+            <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-r from-pink-500 to-purple-600 rounded-xl mr-3 shadow-lg">
+              <Instagram className="h-6 w-6 text-white" />
+            </div>
             <h2 className="text-3xl md:text-4xl font-serif font-bold">Follow Our Journey</h2>
           </motion.div>
           <motion.p
@@ -175,7 +179,7 @@ export default function InstagramSection() {
         </div>
 
         {/* Botones de acción */}
-        <div className="text-center space-y-4 mb-12">
+        <div className="text-center space-y-4 mb-16">
           {/* Botón Ver más posts */}
           {instagramPosts.length > 6 && (
             <motion.button
@@ -205,7 +209,7 @@ export default function InstagramSection() {
 
         {/* Estadísticas */}
         <motion.div
-          className="text-center pb-8"
+          className="text-center pb-12"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.3 }}

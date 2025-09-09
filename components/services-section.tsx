@@ -98,7 +98,7 @@ export default function ServicesSection() {
           </p>
         </div>
 
-        <div className="mb-16">
+        <div className="mb-20">
           <h3 className="text-2xl font-serif font-semibold mb-8 text-center">Core Services</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {coreServices.map((service, index) => (
@@ -114,7 +114,7 @@ export default function ServicesSection() {
           </div>
         </div>
 
-        <div>
+        <div className="mb-24">
           <h3 className="text-2xl font-serif font-semibold mb-8 text-center">Additional Services</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {enhancementServices.map((service, index) => (

@@ -133,7 +133,7 @@ export default function ReviewsSection() {
   return (
     <section 
       id="reviews" 
-      className="py-20 px-4 md:px-6 bg-gradient-to-b from-secondary/10 to-accent/10"
+      className="py-32 px-4 md:px-6 bg-gradient-to-b from-secondary/10 to-accent/10"
       ref={sectionRef}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
@@ -237,18 +237,6 @@ export default function ReviewsSection() {
                 aria-label={`Go to review set ${index + 1}`}
               />
             ))}
-          </motion.div>
-
-          {/* Indicador de estado */}
-          <motion.div 
-            className="text-center mt-4"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.6, delay: 1.2 }}
-          >
-            <span className="text-xs text-gray-500">
-              {isPaused ? 'Paused - Hover to pause • Click arrows to navigate' : 'Auto-playing • Hover to pause'}
-            </span>
           </motion.div>
         </div>
       </div>

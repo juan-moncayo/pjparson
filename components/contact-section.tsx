@@ -38,7 +38,7 @@ export default function ContactSection() {
   };
 
   return (
-    <section id="contact" className="py-20 px-4 md:px-6 bg-gradient-to-b from-accent/10 to-white">
+    <section id="contact" className="py-24 px-4 md:px-6 bg-gradient-to-b from-accent/10 to-white">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16">
           <motion.h2
