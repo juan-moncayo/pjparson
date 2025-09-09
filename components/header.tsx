@@ -32,11 +32,11 @@ export default function Header() {
         transition={{ duration: 2, ease: "easeOut" }}
       />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center py-3">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
+        <div className="flex justify-between items-center h-14 md:h-16 lg:h-18">
           {/* Logo con imagen */}
           <motion.div
-            className="relative"
+            className="relative flex-shrink-0"
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.3, duration: 0.8 }}
@@ -52,13 +52,14 @@ export default function Header() {
                 alt="PJ Parsons Presents - Your Day, Your Way"
                 width={64}
                 height={64}
-                className="h-12 md:h-14 lg:h-16 w-auto object-contain hover:opacity-90 transition-opacity duration-300"
+                className="h-8 md:h-10 lg:h-12 w-auto object-contain hover:opacity-90 transition-opacity duration-300"
+                priority
               />
             </motion.a>
           </motion.div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center space-x-12">
+          <nav className="hidden lg:flex items-center space-x-8 xl:space-x-12">
             {navItems.map((item, index) => (
               <motion.div
                 key={item.name}
@@ -69,7 +70,7 @@ export default function Header() {
               >
                 <a
                   href={item.href}
-                  className="text-gray-700 hover:text-primary font-medium transition-all duration-500 py-2 px-1 relative overflow-hidden"
+                  className="text-gray-700 hover:text-primary font-medium transition-all duration-500 py-2 px-1 relative overflow-hidden text-sm xl:text-base"
                 >
                   <span className="relative z-10">{item.name}</span>
                   
@@ -95,14 +96,14 @@ export default function Header() {
 
           {/* CTA Button - Desktop */}
           <motion.div
-            className="hidden lg:block"
+            className="hidden lg:block flex-shrink-0"
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 1.3, duration: 0.8 }}
           >
             <motion.a
               href="#contact"
-              className="relative group bg-gradient-to-r from-primary to-secondary text-white px-8 py-3 rounded-full overflow-hidden shadow-lg"
+              className="relative group bg-gradient-to-r from-primary to-secondary text-white px-6 py-2 lg:px-8 lg:py-3 rounded-full overflow-hidden shadow-lg text-sm lg:text-base"
               whileHover={{ scale: 1.05, y: -2 }}
               whileTap={{ scale: 0.98 }}
             >
@@ -120,7 +121,7 @@ export default function Header() {
 
           {/* Mobile Menu Button */}
           <motion.button
-            className="lg:hidden relative p-3"
+            className="lg:hidden relative p-2 flex-shrink-0"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             whileTap={{ scale: 0.95 }}
             initial={{ opacity: 0 }}
@@ -137,7 +138,7 @@ export default function Header() {
                     exit={{ rotate: 90, opacity: 0 }}
                     transition={{ duration: 0.3 }}
                   >
-                    <X className="h-6 w-6 text-gray-800" />
+                    <X className="h-5 w-5 md:h-6 md:w-6 text-gray-800" />
                   </motion.div>
                 ) : (
                   <motion.div
@@ -147,7 +148,7 @@ export default function Header() {
                     exit={{ rotate: -90, opacity: 0 }}
                     transition={{ duration: 0.3 }}
                   >
-                    <Menu className="h-6 w-6 text-gray-800" />
+                    <Menu className="h-5 w-5 md:h-6 md:w-6 text-gray-800" />
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -159,7 +160,7 @@ export default function Header() {
         <AnimatePresence>
           {isMenuOpen && (
             <motion.nav
-              className="min-[1200px]:hidden bg-white border-t border-gray-200/50 py-6 rounded-b-3xl shadow-xl"
+              className="lg:hidden bg-white border-t border-gray-200/50 py-3 rounded-b-2xl shadow-xl absolute left-0 right-0 top-full mx-3 sm:mx-4"
               initial={{ opacity: 0, height: 0, y: -20 }}
               animate={{ opacity: 1, height: 'auto', y: 0 }}
               exit={{ opacity: 0, height: 0, y: -20 }}
@@ -170,7 +171,7 @@ export default function Header() {
                   <motion.a
                     key={item.name}
                     href={item.href}
-                    className="block py-4 px-6 text-gray-700 hover:text-primary hover:bg-gradient-to-r hover:from-primary/5 hover:to-secondary/5 rounded-xl mx-2 transition-all duration-300 font-medium"
+                    className="block py-2.5 px-4 text-gray-700 hover:text-primary hover:bg-gradient-to-r hover:from-primary/5 hover:to-secondary/5 rounded-lg mx-2 transition-all duration-300 font-medium text-sm"
                     onClick={() => {
                       setIsMenuOpen(false);
                       // Pequeña pausa para que se cierre el menú antes de hacer scroll
@@ -191,14 +192,14 @@ export default function Header() {
                 ))}
                 
                 <motion.div
-                  className="pt-4 px-2"
+                  className="pt-2 px-2"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.6, duration: 0.4 }}
                 >
                   <a
                     href="#contact"
-                    className="block bg-gradient-to-r from-primary to-secondary text-white text-center py-4 rounded-xl font-medium shadow-lg"
+                    className="block bg-gradient-to-r from-primary to-secondary text-white text-center py-2.5 rounded-lg font-medium shadow-lg text-sm"
                     onClick={() => {
                       setIsMenuOpen(false);
                       setTimeout(() => {

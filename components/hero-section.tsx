@@ -20,7 +20,7 @@ export default function HeroSection() {
   };
 
   return (
-    <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden">
+    <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden pt-14 md:pt-16 lg:pt-18">
       {/* Image Background */}
       <div className="absolute inset-0 w-full h-full">
         {isClient && (
@@ -38,24 +38,24 @@ export default function HeroSection() {
         <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-transparent to-secondary/10"></div>
       </div>
       
-      <div className="relative z-10 text-center px-4 max-w-7xl mx-auto pt-20">
+      <div className="relative z-10 text-center px-4 max-w-7xl mx-auto">
         {/* Elemento decorativo superior con estrellita */}
         <motion.div
-          className="flex justify-center mb-8"
+          className="flex justify-center mb-6 md:mb-8"
           initial={{ opacity: 0, y: -30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.5 }}
         >
           <div className="flex items-center space-x-4">
-            <div className="w-16 h-0.5 bg-gradient-to-r from-transparent to-white/60"></div>
-            <Sparkles className="h-6 w-6 text-white/80" />
-            <div className="w-16 h-0.5 bg-gradient-to-l from-transparent to-white/60"></div>
+            <div className="w-12 md:w-16 h-0.5 bg-gradient-to-r from-transparent to-white/60"></div>
+            <Sparkles className="h-5 w-5 md:h-6 md:w-6 text-white/80" />
+            <div className="w-12 md:w-16 h-0.5 bg-gradient-to-l from-transparent to-white/60"></div>
           </div>
         </motion.div>
         
         {/* Título principal */}
         <motion.h1
-          className="text-6xl md:text-8xl lg:text-9xl font-serif font-light text-white mb-8 leading-tight tracking-wide"
+          className="text-4xl md:text-6xl lg:text-8xl xl:text-9xl font-serif font-light text-white mb-6 md:mb-8 leading-tight tracking-wide"
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1.2, delay: 0.8 }}
@@ -80,49 +80,49 @@ export default function HeroSection() {
         
         {/* Subtítulo elegante */}
         <motion.div
-          className="max-w-4xl mx-auto mb-12"
+          className="max-w-4xl mx-auto mb-8 md:mb-12"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 1.8 }}
         >
-          <p className="text-xl md:text-2xl text-white/90 font-serif mb-4 leading-relaxed">
+          <p className="text-lg md:text-xl lg:text-2xl text-white/90 font-serif mb-3 md:mb-4 leading-relaxed">
             Professional wedding and event services since 
             <span className="text-secondary font-medium"> 2002</span>
           </p>
-          <p className="text-lg text-white/70 font-light">
+          <p className="text-base md:text-lg text-white/70 font-light">
             Snohomish County&apos;s premier wedding specialists
           </p>
         </motion.div>
 
         {/* Frase característica de PJ Parsons */}
         <motion.div
-          className="mb-12"
+          className="mb-8 md:mb-12"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8, delay: 2.1 }}
         >
-          <p className="text-lg md:text-xl text-accent font-serif italic">
+          <p className="text-base md:text-lg lg:text-xl text-accent font-serif italic px-4">
             &ldquo;When was the last time you saw someone hug their wedding DJ?&rdquo;
           </p>
-          <p className="text-white/70 mt-2">
+          <p className="text-white/70 mt-2 text-sm md:text-base">
             That happens to us a lot. We care deeply about our clients.
           </p>
         </motion.div>
         
         {/* Botones de acción elegantes */}
         <motion.div
-          className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-center mb-16 px-4"
+          className="flex flex-col sm:flex-row gap-3 sm:gap-4 md:gap-6 justify-center items-center mb-12 md:mb-16 px-4"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 1.9 }}
         >
           <motion.button
             onClick={scrollToServices}
-            className="w-full sm:w-auto group relative bg-white/10 backdrop-blur-sm border border-white/30 text-white px-8 py-4 rounded-full overflow-hidden transition-all duration-500 hover:bg-white/20"
+            className="w-full sm:w-auto group relative bg-white/10 backdrop-blur-sm border border-white/30 text-white px-6 md:px-8 py-3 md:py-4 rounded-full overflow-hidden transition-all duration-500 hover:bg-white/20 text-sm md:text-base lg:text-lg"
             whileHover={{ scale: 1.05, y: -2 }}
             whileTap={{ scale: 0.98 }}
           >
-            <span className="relative z-10 font-medium text-lg">Explore Our Services</span>
+            <span className="relative z-10 font-medium">Explore Our Services</span>
             <motion.div
               className="absolute inset-0 bg-gradient-to-r from-primary/30 to-secondary/30"
               initial={{ x: "-100%" }}
@@ -133,11 +133,11 @@ export default function HeroSection() {
           
           <motion.a
             href="#contact"
-            className="w-full sm:w-auto group relative bg-gradient-to-r from-primary to-secondary text-white px-8 py-4 rounded-full overflow-hidden shadow-xl"
+            className="w-full sm:w-auto group relative bg-gradient-to-r from-primary to-secondary text-white px-6 md:px-8 py-3 md:py-4 rounded-full overflow-hidden shadow-xl text-sm md:text-base lg:text-lg"
             whileHover={{ scale: 1.05, y: -2 }}
             whileTap={{ scale: 0.98 }}
           >
-            <span className="relative z-10 font-medium text-lg">Free Consultation</span>
+            <span className="relative z-10 font-medium">Free Consultation</span>
             <motion.div
               className="absolute inset-0 bg-gradient-to-r from-secondary to-accent"
               initial={{ x: "-100%" }}
