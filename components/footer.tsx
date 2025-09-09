@@ -29,7 +29,7 @@ export default function Footer() {
               Founded in 2002, specializing in Snohomish County weddings while serving the entire Puget Sound and Western/Eastern Washington area.
             </p>
             <p className="text-gray-400 text-sm italic font-serif">
-              "Your Day, Your Way"
+              &ldquo;Your Day, Your Way&rdquo;
             </p>
           </div>
           

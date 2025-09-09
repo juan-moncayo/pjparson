@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
 
@@ -46,9 +47,11 @@ export default function Header() {
               whileHover={{ scale: 1.02 }}
               transition={{ duration: 0.2 }}
             >
-              <img
+              <Image
                 src="/pj.png"
                 alt="PJ Parsons Presents - Your Day, Your Way"
+                width={64}
+                height={64}
                 className="h-12 md:h-14 lg:h-16 w-auto object-contain hover:opacity-90 transition-opacity duration-300"
               />
             </motion.a>

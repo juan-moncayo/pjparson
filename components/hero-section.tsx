@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { motion } from "framer-motion";
-import { ArrowDown, Sparkles } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 
 export default function HeroSection() {
   const [isClient, setIsClient] = useState(false);
@@ -23,10 +24,12 @@ export default function HeroSection() {
       {/* Image Background */}
       <div className="absolute inset-0 w-full h-full">
         {isClient && (
-          <img
+          <Image
             src="/hero.jpg"
             alt="Wedding and event background"
-            className="w-full h-full object-cover"
+            fill
+            className="object-cover"
+            priority
           />
         )}
         
@@ -87,7 +90,7 @@ export default function HeroSection() {
             <span className="text-secondary font-medium"> 2002</span>
           </p>
           <p className="text-lg text-white/70 font-light">
-            Snohomish County's premier wedding specialists
+            Snohomish County&apos;s premier wedding specialists
           </p>
         </motion.div>
 
@@ -99,7 +102,7 @@ export default function HeroSection() {
           transition={{ duration: 0.8, delay: 2.1 }}
         >
           <p className="text-lg md:text-xl text-accent font-serif italic">
-            "When was the last time you saw someone hug their wedding DJ?"
+            &ldquo;When was the last time you saw someone hug their wedding DJ?&rdquo;
           </p>
           <p className="text-white/70 mt-2">
             That happens to us a lot. We care deeply about our clients.

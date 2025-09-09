@@ -56,7 +56,7 @@ export default function AboutSection() {
             <h3 className="text-2xl font-serif font-semibold mb-4">Our Story</h3>
             <p className="text-gray-600 mb-6">
               Wedding Template was founded with a simple mission: to create unforgettable wedding experiences that
-              reflect each couple's unique love story. With years of experience in the wedding industry, our team brings
+              reflect each couple&apos;s unique love story. With years of experience in the wedding industry, our team brings
               passion, creativity, and professionalism to every event.
             </p>
             <p className="text-gray-600 mb-6">

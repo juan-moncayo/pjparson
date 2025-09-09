@@ -78,7 +78,7 @@ const ReviewCard = ({ review, index }: ReviewCardProps) => {
           </div>
           <span className="text-xs text-gray-500 font-medium">{review.source}</span>
         </div>
-        <p className="text-gray-600 mb-4 italic leading-relaxed text-sm">"{review.text}"</p>
+        <p className="text-gray-600 mb-4 italic leading-relaxed text-sm">&ldquo;{review.text}&rdquo;</p>
       </div>
       <div className="border-t pt-4">
         <p className="font-semibold font-serif text-gray-800">- {review.name}</p>
@@ -89,7 +89,7 @@ const ReviewCard = ({ review, index }: ReviewCardProps) => {
 
 export default function ReviewsSection() {
   const [currentStartIndex, setCurrentStartIndex] = useState(0);
-  const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+  const [isAutoPlaying] = useState(true);
   const [isPaused, setIsPaused] = useState(false);
   const sectionRef = useRef<HTMLDivElement>(null);
 
@@ -170,7 +170,7 @@ export default function ReviewsSection() {
             transition={{ duration: 0.6, delay: 0.3, ease: "easeOut" }}
             viewport={{ once: true }}
           >
-            Don't just take our word for it. Here's what couples have to say about their experience with PJ Parsons Presents.
+            Don&apos;t just take our word for it. Here&apos;s what couples have to say about their experience with PJ Parsons Presents.
           </motion.p>
         </div>
 
