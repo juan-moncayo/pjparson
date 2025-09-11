@@ -290,8 +290,8 @@ export default function AboutSection() {
         >
           <h3 className="text-2xl font-serif font-semibold mb-4">Ready to Work With Us?</h3>
           <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
-            Let's discuss how our experienced team can make your wedding day absolutely perfect. 
-            Contact us for a free consultation and let's start planning your dream celebration.
+            Let&apos;s discuss how our experienced team can make your wedding day absolutely perfect. 
+            Contact us for a free consultation and let&apos;s start planning your dream celebration.
           </p>
           <motion.button
             onClick={() => scrollToSection("#contact")}

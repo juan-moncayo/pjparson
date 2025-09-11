@@ -125,7 +125,7 @@ export default function HeroSection() {
             <span className="text-secondary font-medium"> 2002</span>
           </p>
           <p className="text-base md:text-lg text-white/70 font-light">
-            Snohomish County's premier wedding specialists
+            Snohomish County&apos;s premier wedding specialists
           </p>
         </motion.div>
 
@@ -137,7 +137,7 @@ export default function HeroSection() {
           transition={{ duration: 0.8, delay: 2.1 }}
         >
           <p className="text-base md:text-lg lg:text-xl text-accent font-serif italic px-4">
-            "When was the last time you saw someone hug their wedding DJ?"
+            &ldquo;When was the last time you saw someone hug their wedding DJ?&rdquo;
           </p>
           <p className="text-white/70 mt-2 text-sm md:text-base">
             That happens to us a lot. We care deeply about our clients.
