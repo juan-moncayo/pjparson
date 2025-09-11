@@ -7,7 +7,7 @@ import { Mail, Phone } from 'lucide-react';
 export default function AboutSection() {
   // Función para scroll con offset (igual que en el header)
   const scrollToSection = (href: string) => {
-    const section = document.querySelector(href);
+    const section = document.querySelector(href) as HTMLElement;
     if (section) {
       const isMobile = window.innerWidth < 1024;
       

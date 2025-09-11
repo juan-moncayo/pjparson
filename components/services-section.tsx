@@ -14,7 +14,7 @@ interface ServiceCardProps {
 const ServiceCard = ({ title, description, image, delay, color }: ServiceCardProps) => {
   // Función para scroll con offset (igual que en el header)
   const scrollToSection = (href: string) => {
-    const section = document.querySelector(href);
+    const section = document.querySelector(href) as HTMLElement;
     if (section) {
       const isMobile = window.innerWidth < 1024;
       
