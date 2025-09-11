@@ -18,13 +18,13 @@ export default function Header() {
   ];
 
   // Función personalizada para scroll con offset ajustable
-  const scrollToSection = (href, isMobile = false) => {
-    const section = document.querySelector(href);
+  const scrollToSection = (href: string, isMobile = false) => {
+    const section = document.querySelector(href) as HTMLElement;
     if (section) {
       if (isMobile) {
         // Para móvil: scroll personalizado con offset
-        const headerHeight = 70; // Altura del header en móvil
-        const mobileOffset = 20; // CAMBIA ESTE VALOR PARA MÓVIL: positivo baja más, negativo sube más
+        const headerHeight = 70;
+        const mobileOffset = 30; // CAMBIA ESTE VALOR PARA MÓVIL: positivo baja más, negativo sube más
         
         const elementPosition = section.offsetTop;
         const offsetPosition = elementPosition - headerHeight + mobileOffset;
@@ -34,7 +34,7 @@ export default function Header() {
           behavior: 'smooth'
         });
       } else {
-        // Para desktop: usar scroll personalizado con offset
+        // Para desktop: scroll personalizado con offset
         const headerHeight = 80;
         const adjustOffset = 14; // CAMBIA ESTE VALOR PARA DESKTOP: positivo baja más, negativo sube más
         
@@ -176,7 +176,7 @@ export default function Header() {
                   <motion.div
                     key="menu"
                     initial={{ rotate: 90, opacity: 0 }}
-                    animate={{ rotate: 0, opacity: 1 }}
+                    animate={{ opacity: 1, rotate: 0 }}
                     exit={{ rotate: -90, opacity: 0 }}
                     transition={{ duration: 0.3 }}
                   >
