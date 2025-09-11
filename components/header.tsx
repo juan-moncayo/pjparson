@@ -17,6 +17,38 @@ export default function Header() {
     { name: 'Contact', href: '#contact' }
   ];
 
+  // Función personalizada para scroll con offset ajustable
+  const scrollToSection = (href, isMobile = false) => {
+    const section = document.querySelector(href);
+    if (section) {
+      if (isMobile) {
+        // Para móvil: scroll personalizado con offset
+        const headerHeight = 70; // Altura del header en móvil
+        const mobileOffset = 20; // CAMBIA ESTE VALOR PARA MÓVIL: positivo baja más, negativo sube más
+        
+        const elementPosition = section.offsetTop;
+        const offsetPosition = elementPosition - headerHeight + mobileOffset;
+        
+        window.scrollTo({
+          top: Math.max(0, offsetPosition),
+          behavior: 'smooth'
+        });
+      } else {
+        // Para desktop: usar scroll personalizado con offset
+        const headerHeight = 80;
+        const adjustOffset = 14; // CAMBIA ESTE VALOR PARA DESKTOP: positivo baja más, negativo sube más
+        
+        const elementPosition = section.offsetTop;
+        const offsetPosition = elementPosition - headerHeight + adjustOffset;
+        
+        window.scrollTo({
+          top: Math.max(0, offsetPosition),
+          behavior: 'smooth'
+        });
+      }
+    }
+  };
+
   return (
     <motion.header
       className="fixed top-0 w-full z-50 bg-white shadow-lg border-b border-primary/20"
@@ -41,8 +73,8 @@ export default function Header() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.3, duration: 0.8 }}
           >
-            <motion.a
-              href="#home"
+            <motion.button
+              onClick={() => scrollToSection('#home', window.innerWidth < 1024)}
               className="block"
               whileHover={{ scale: 1.02 }}
               transition={{ duration: 0.2 }}
@@ -55,7 +87,7 @@ export default function Header() {
                 className="h-12 md:h-14 lg:h-16 w-auto object-contain hover:opacity-90 transition-opacity duration-300"
                 priority
               />
-            </motion.a>
+            </motion.button>
           </motion.div>
 
           {/* Desktop Navigation */}
@@ -68,8 +100,8 @@ export default function Header() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.7 + index * 0.1, duration: 0.6 }}
               >
-                <a
-                  href={item.href}
+                <button
+                  onClick={() => scrollToSection(item.href, false)} // Desktop = false
                   className="text-gray-700 hover:text-primary font-medium transition-all duration-500 py-2 px-1 relative overflow-hidden text-sm xl:text-base"
                 >
                   <span className="relative z-10">{item.name}</span>
@@ -89,7 +121,7 @@ export default function Header() {
                     whileHover={{ x: "100%" }}
                     transition={{ duration: 0.6, ease: "easeInOut" }}
                   />
-                </a>
+                </button>
               </motion.div>
             ))}
           </nav>
@@ -101,8 +133,8 @@ export default function Header() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 1.3, duration: 0.8 }}
           >
-            <motion.a
-              href="#contact"
+            <motion.button
+              onClick={() => scrollToSection('#contact', false)} // Desktop = false
               className="relative group bg-gradient-to-r from-primary to-secondary text-white px-6 py-2 lg:px-8 lg:py-3 rounded-full overflow-hidden shadow-lg text-sm lg:text-base"
               whileHover={{ scale: 1.05, y: -2 }}
               whileTap={{ scale: 0.98 }}
@@ -116,7 +148,7 @@ export default function Header() {
                 whileHover={{ x: "100%" }}
                 transition={{ duration: 0.8, ease: "easeInOut" }}
               />
-            </motion.a>
+            </motion.button>
           </motion.div>
 
           {/* Mobile Menu Button */}
@@ -168,27 +200,22 @@ export default function Header() {
             >
               <div className="space-y-1">
                 {navItems.map((item, index) => (
-                  <motion.a
+                  <motion.button
                     key={item.name}
-                    href={item.href}
-                    className="block py-2.5 px-4 text-gray-700 hover:text-primary hover:bg-gradient-to-r hover:from-primary/5 hover:to-secondary/5 rounded-lg mx-2 transition-all duration-300 font-medium text-sm"
                     onClick={() => {
                       setIsMenuOpen(false);
-                      // Pequeña pausa para que se cierre el menú antes de hacer scroll
                       setTimeout(() => {
-                        const section = document.querySelector(item.href);
-                        if (section) {
-                          section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                        }
+                        scrollToSection(item.href, true); // Móvil = true
                       }, 100);
                     }}
+                    className="block w-full text-left py-2.5 px-4 text-gray-700 hover:text-primary hover:bg-gradient-to-r hover:from-primary/5 hover:to-secondary/5 rounded-lg mx-2 transition-all duration-300 font-medium text-sm"
                     initial={{ opacity: 0, x: -30 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.1, duration: 0.4 }}
                     whileTap={{ scale: 0.98 }}
                   >
                     {item.name}
-                  </motion.a>
+                  </motion.button>
                 ))}
                 
                 <motion.div
@@ -197,21 +224,17 @@ export default function Header() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.6, duration: 0.4 }}
                 >
-                  <a
-                    href="#contact"
-                    className="block bg-gradient-to-r from-primary to-secondary text-white text-center py-2.5 rounded-lg font-medium shadow-lg text-sm"
+                  <button
                     onClick={() => {
                       setIsMenuOpen(false);
                       setTimeout(() => {
-                        const section = document.querySelector('#contact');
-                        if (section) {
-                          section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                        }
+                        scrollToSection('#contact', true); // Móvil = true
                       }, 100);
                     }}
+                    className="block w-full bg-gradient-to-r from-primary to-secondary text-white text-center py-2.5 rounded-lg font-medium shadow-lg text-sm"
                   >
                     Book Now
-                  </a>
+                  </button>
                 </motion.div>
               </div>
             </motion.nav>

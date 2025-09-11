@@ -3,11 +3,44 @@
 import { motion } from 'framer-motion';
 
 export default function Footer() {
-  const handleNavClick = (href: string) => {
+  const currentYear = new Date().getFullYear();
+  
+  // Función para scroll con offset (igual que en el header)
+  const scrollToSection = (href: string) => {
     const section = document.querySelector(href);
     if (section) {
-      section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      const isMobile = window.innerWidth < 1024;
+      
+      if (isMobile) {
+        // Para móvil: scroll personalizado con offset
+        const headerHeight = 70;
+        const mobileOffset = 20;
+        
+        const elementPosition = section.offsetTop;
+        const offsetPosition = elementPosition - headerHeight + mobileOffset;
+        
+        window.scrollTo({
+          top: Math.max(0, offsetPosition),
+          behavior: 'smooth'
+        });
+      } else {
+        // Para desktop: scroll personalizado con offset
+        const headerHeight = 80;
+        const adjustOffset = 14;
+        
+        const elementPosition = section.offsetTop;
+        const offsetPosition = elementPosition - headerHeight + adjustOffset;
+        
+        window.scrollTo({
+          top: Math.max(0, offsetPosition),
+          behavior: 'smooth'
+        });
+      }
     }
+  };
+
+  const openPrivacyPolicy = () => {
+    window.open('/privacy-policy', '_blank');
   };
 
   return (
@@ -38,7 +71,7 @@ export default function Footer() {
             <ul className="space-y-2 text-sm text-gray-300">
               <li>
                 <button 
-                  onClick={() => handleNavClick('#home')}
+                  onClick={() => scrollToSection('#home')}
                   className="hover:text-white transition-colors duration-300 text-left w-full"
                 >
                   Home
@@ -46,7 +79,7 @@ export default function Footer() {
               </li>
               <li>
                 <button 
-                  onClick={() => handleNavClick('#services')}
+                  onClick={() => scrollToSection('#services')}
                   className="hover:text-white transition-colors duration-300 text-left w-full"
                 >
                   Services
@@ -54,7 +87,7 @@ export default function Footer() {
               </li>
               <li>
                 <button 
-                  onClick={() => handleNavClick('#about')}
+                  onClick={() => scrollToSection('#about')}
                   className="hover:text-white transition-colors duration-300 text-left w-full"
                 >
                   Our Team
@@ -62,7 +95,7 @@ export default function Footer() {
               </li>
               <li>
                 <button 
-                  onClick={() => handleNavClick('#reviews')}
+                  onClick={() => scrollToSection('#reviews')}
                   className="hover:text-white transition-colors duration-300 text-left w-full"
                 >
                   Reviews
@@ -70,7 +103,7 @@ export default function Footer() {
               </li>
               <li>
                 <button 
-                  onClick={() => handleNavClick('#contact')}
+                  onClick={() => scrollToSection('#contact')}
                   className="hover:text-white transition-colors duration-300 text-left w-full"
                 >
                   Contact
@@ -154,9 +187,25 @@ export default function Footer() {
           </div>
         </div>
         
-        <div className="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400 text-sm">
-          <p>&copy; 2024 PJ Parsons Presents. All rights reserved.</p>
-          <p className="mt-2">Weddings - Corporate Events - School Dances | DJ / Coordination / MC+Host / Photo Booth / Lighting</p>
+        <div className="border-t border-gray-700 mt-8 pt-8">
+          <div className="text-center text-gray-400 text-sm">
+            <p>&copy; {currentYear} PJ Parsons Presents. All rights reserved.</p>
+            <p className="mt-2">Weddings - Corporate Events - School Dances | DJ / Coordination / MC+Host / Photo Booth / Lighting</p>
+            
+            {/* Links de Políticas */}
+            <div className="mt-4 flex flex-col sm:flex-row justify-center items-center space-y-2 sm:space-y-0 sm:space-x-6">
+              <button
+                onClick={openPrivacyPolicy}
+                className="text-gray-400 hover:text-white transition-colors duration-300 underline"
+              >
+                Privacy Policy & Terms of Service
+              </button>
+              <span className="hidden sm:block text-gray-600">|</span>
+              <p className="text-gray-500">
+                Website designed with care for your special day
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </footer>

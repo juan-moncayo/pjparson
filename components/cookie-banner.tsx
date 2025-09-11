@@ -38,6 +38,10 @@ export default function CookieBanner({ show }: CookieBannerProps) {
     setIsVisible(false);
   };
 
+  const openPrivacyPolicy = () => {
+    window.open('/privacy-policy', '_blank');
+  };
+
   if (hasAccepted || !isVisible) return null;
 
   return (
@@ -97,9 +101,12 @@ export default function CookieBanner({ show }: CookieBannerProps) {
               
               <p className="text-xs text-gray-500 mt-3">
                 You can change your preferences anytime in our{" "}
-                <a href="#" className="text-primary hover:underline">
+                <button 
+                  onClick={openPrivacyPolicy}
+                  className="text-primary hover:underline transition-colors"
+                >
                   Privacy Policy
-                </a>
+                </button>
               </p>
             </div>
           </div>

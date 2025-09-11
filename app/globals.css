@@ -27,20 +27,20 @@ header {
   min-height: fit-content;
 }
 
-/* Padding para secciones - evita que se corten los títulos */
+/* Padding para secciones - evita que se corten los títulos - MEJORADO */
 section[id] {
-  scroll-margin-top: 5.5rem; /* 88px para móvil - más grande */
+  scroll-margin-top: 6rem; /* 96px para móvil */
 }
 
 @media (min-width: 768px) {
   section[id] {
-    scroll-margin-top: 5.5rem; /* 88px para tablet */
+    scroll-margin-top: 6.5rem; /* 104px para tablet */
   }
 }
 
 @media (min-width: 1024px) {
   section[id] {
-    scroll-margin-top: 6rem; /* 96px para desktop */
+    scroll-margin-top: 7rem; /* 112px para desktop */
   }
 }
 
@@ -51,7 +51,24 @@ section[id="home"] {
 
 /* Asegurar mejor espaciado para títulos de secciones */
 section[id] h2 {
-  padding-top: 1rem;
+  padding-top: 0.5rem;
+}
+
+/* Asegurar que las secciones tengan suficiente espacio superior */
+section[id]:not(#home) {
+  padding-top: 0.5rem; /* REDUCIDO */
+}
+
+@media (min-width: 768px) {
+  section[id]:not(#home) {
+    padding-top: 1rem; /* REDUCIDO */
+  }
+}
+
+@media (min-width: 1024px) {
+  section[id]:not(#home) {
+    padding-top: 1.5rem; /* REDUCIDO */
+  }
 }
 
 /* Animaciones personalizadas */
