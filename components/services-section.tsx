@@ -21,7 +21,7 @@ const ServiceCard = ({ title, description, image, delay, color }: ServiceCardPro
       if (isMobile) {
         // Para móvil: scroll personalizado con offset
         const headerHeight = 70;
-        const mobileOffset = 20;
+        const mobileOffset = 30; // CAMBIA ESTE VALOR PARA MÓVIL
         
         const elementPosition = section.offsetTop;
         const offsetPosition = elementPosition - headerHeight + mobileOffset;
@@ -33,7 +33,7 @@ const ServiceCard = ({ title, description, image, delay, color }: ServiceCardPro
       } else {
         // Para desktop: scroll personalizado con offset
         const headerHeight = 80;
-        const adjustOffset = 14;
+        const adjustOffset = 14; // CAMBIA ESTE VALOR PARA DESKTOP
         
         const elementPosition = section.offsetTop;
         const offsetPosition = elementPosition - headerHeight + adjustOffset;
@@ -84,14 +84,14 @@ const ServiceCard = ({ title, description, image, delay, color }: ServiceCardPro
 export default function ServicesSection() {
   // Función para scroll con offset (igual que en el header)
   const scrollToSection = (href: string) => {
-    const section = document.querySelector(href);
+    const section = document.querySelector(href) as HTMLElement;
     if (section) {
       const isMobile = window.innerWidth < 1024;
       
       if (isMobile) {
         // Para móvil: scroll personalizado con offset
         const headerHeight = 70;
-        const mobileOffset = 20;
+        const mobileOffset = 30; // CAMBIA ESTE VALOR PARA MÓVIL
         
         const elementPosition = section.offsetTop;
         const offsetPosition = elementPosition - headerHeight + mobileOffset;
@@ -103,7 +103,7 @@ export default function ServicesSection() {
       } else {
         // Para desktop: scroll personalizado con offset
         const headerHeight = 80;
-        const adjustOffset = 14;
+        const adjustOffset = 14; // CAMBIA ESTE VALOR PARA DESKTOP
         
         const elementPosition = section.offsetTop;
         const offsetPosition = elementPosition - headerHeight + adjustOffset;

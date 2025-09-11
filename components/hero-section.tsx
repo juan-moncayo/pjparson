@@ -14,12 +14,12 @@ export default function HeroSection() {
 
   // Función para scroll con offset (igual que en el header)
   const scrollToSection = (href: string, isMobile = false) => {
-    const section = document.querySelector(href);
+    const section = document.querySelector(href) as HTMLElement;
     if (section) {
       if (isMobile) {
         // Para móvil: scroll personalizado con offset
         const headerHeight = 70;
-        const mobileOffset = 20; // Ajustable para móvil
+        const mobileOffset = 30; // CAMBIA ESTE VALOR PARA MÓVIL
         
         const elementPosition = section.offsetTop;
         const offsetPosition = elementPosition - headerHeight + mobileOffset;
@@ -31,7 +31,7 @@ export default function HeroSection() {
       } else {
         // Para desktop: scroll personalizado con offset
         const headerHeight = 80;
-        const adjustOffset = 14; // Ajustable para desktop
+        const adjustOffset = 14; // CAMBIA ESTE VALOR PARA DESKTOP
         
         const elementPosition = section.offsetTop;
         const offsetPosition = elementPosition - headerHeight + adjustOffset;
