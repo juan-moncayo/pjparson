@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Image from "next/image";
 import { motion } from "framer-motion";
 import { Sparkles } from 'lucide-react';
 
@@ -56,16 +55,19 @@ export default function HeroSection() {
 
   return (
     <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20 md:pt-20 lg:pt-22">
-      {/* Image Background */}
+      {/* Video Background */}
       <div className="absolute inset-0 w-full h-full">
         {isClient && (
-          <Image
-            src="/hero.jpg"
-            alt="Wedding and event background"
-            fill
-            className="object-cover"
-            priority
-          />
+          <video
+            className="absolute inset-0 w-full h-full object-cover"
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="metadata"
+          >
+            <source src="/hero.webm" type="video/webm" />
+          </video>
         )}
         
         {/* Overlay elegante */}

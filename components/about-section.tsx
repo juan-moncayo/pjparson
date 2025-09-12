@@ -73,7 +73,7 @@ export default function AboutSection() {
           >
             <div className="relative h-[400px] md:h-[500px] rounded-xl overflow-hidden shadow-lg">
               <Image
-                src="/team-photo.jpg" // Recommended: 800x600px or 1200x900px
+                src="/AboutUs.jpg" // Recommended: 800x600px or 1200x900px
                 alt="PJ Parsons Presents Team"
                 fill
                 className="object-cover"
