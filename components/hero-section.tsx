@@ -1,15 +1,50 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { Sparkles } from 'lucide-react';
 
 export default function HeroSection() {
   const [isClient, setIsClient] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
     setIsClient(true);
-  }, []);
+    
+    // Forzar reproducción del video cuando el componente se monte
+    if (videoRef.current) {
+      const playVideo = async () => {
+        try {
+          // Asegurar que el video esté muted antes de intentar reproducir
+          videoRef.current!.muted = true;
+          await videoRef.current!.play();
+        } catch (error) {
+          console.log('Autoplay prevented:', error);
+        }
+      };
+      
+      // Intentar reproducir inmediatamente
+      playVideo();
+      
+      // También intentar cuando el usuario interactúe con la página
+      const handleUserInteraction = () => {
+        if (videoRef.current) {
+          videoRef.current.play().catch(() => {});
+        }
+        // Remover el listener después del primer uso
+        document.removeEventListener('touchstart', handleUserInteraction);
+        document.removeEventListener('click', handleUserInteraction);
+      };
+      
+      document.addEventListener('touchstart', handleUserInteraction);
+      document.addEventListener('click', handleUserInteraction);
+      
+      return () => {
+        document.removeEventListener('touchstart', handleUserInteraction);
+        document.removeEventListener('click', handleUserInteraction);
+      };
+    }
+  }, [isClient]);
 
   // Función para scroll con offset (igual que en el header)
   const scrollToSection = (href: string, isMobile = false) => {
@@ -59,14 +94,22 @@ export default function HeroSection() {
       <div className="absolute inset-0 w-full h-full">
         {isClient && (
           <video
+            ref={videoRef}
             className="absolute inset-0 w-full h-full object-cover"
             autoPlay
             muted
             loop
             playsInline
-            preload="metadata"
+            preload="auto"
+            controls={false}
+            disablePictureInPicture
+            webkit-playsinline="true"
+            x5-playsinline="true"
+            poster="/hero-poster.jpg"
+            style={{ pointerEvents: 'none' }}
           >
             <source src="/hero.webm" type="video/webm" />
+            <source src="/hero.mp4" type="video/mp4" />
           </video>
         )}
         

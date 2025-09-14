@@ -1,50 +1,30 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { Star, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Star, ChevronLeft, ChevronRight, Loader2, AlertCircle, ExternalLink } from 'lucide-react';
 import { motion, AnimatePresence } from "framer-motion";
 
-// Reviews reales de PJ Parsons
-const reviews = [
-  {
-    id: 1,
-    name: "Ashley Short",
-    rating: 5,
-    text: "The PJ Parsons Presents team was amazing to work with!! From helping set up the day of, making announcements, and playing the best dance songs, the team helped the day run so smoothly! Matt's energy while DJing was awesome for all of our guests!!",
-    source: "Google Reviews",
-  },
-  {
-    id: 2,
-    name: "Nyssa W.",
-    rating: 5,
-    text: "Seriously, stop looking and hire this company. Beyond outstanding, I had an amazing experience with them. I love that you get a day of coordinator and a DJ when you use this company! The DJ/MCs were absolutely fantastic as well.",
-    source: "The Knot Reviews",
-  },
-  {
-    id: 3,
-    name: "Madison",
-    rating: 5,
-    text: "We had PJ Parsons as our DJ for our wedding, as well as for our day of coordinator! PJ's crew was ON IT for MC and DJing! They were fun, polite and knew exactly what the crowd needed, and when. They kept our night flowing seamlessly!",
-    source: "Wedding Wire Reviews",
-  },
-  {
-    id: 4,
-    name: "Sarah Johnson",
-    rating: 5,
-    text: "PJ Parsons made our wedding day absolutely perfect! The DJ kept everyone dancing all night, and the coordination services ensured everything ran smoothly. Highly recommended!",
-    source: "Google Reviews",
-  },
-  {
-    id: 5,
-    name: "Michael Torres",
-    rating: 5,
-    text: "We hired PJ Parsons for both DJ and planning services, and it was the best decision we made. They understood exactly what we wanted and exceeded our expectations.",
-    source: "Wedding Wire Reviews",
-  }
-];
+interface GoogleReview {
+  author_name: string;
+  author_url?: string;
+  language?: string;
+  profile_photo_url?: string;
+  rating: number;
+  relative_time_description: string;
+  text: string;
+  time: number;
+}
+
+interface GooglePlaceDetails {
+  name: string;
+  rating: number;
+  user_ratings_total: number;
+  reviews: GoogleReview[];
+  url?: string;
+}
 
 interface ReviewCardProps {
-  review: typeof reviews[0];
+  review: GoogleReview;
   index: number;
 }
 
@@ -67,8 +47,33 @@ const ReviewCard = ({ review, index }: ReviewCardProps) => {
       }}
     >
       <div>
-        <div className="flex items-center justify-between mb-3 md:mb-4">
-          <div className="flex">
+        {/* Header con foto y nombre */}
+        <div className="flex items-center mb-3 md:mb-4">
+          <div className="flex items-center flex-1">
+            {review.profile_photo_url ? (
+              <img
+                src={review.profile_photo_url}
+                alt={review.author_name}
+                className="w-10 h-10 rounded-full mr-3 object-cover"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.style.display = 'none';
+                  const fallback = target.nextElementSibling as HTMLElement;
+                  if (fallback) fallback.style.display = 'flex';
+                }}
+              />
+            ) : null}
+            <div className={`w-10 h-10 rounded-full mr-3 bg-gradient-to-r from-primary to-secondary flex items-center justify-center text-white font-semibold text-sm ${review.profile_photo_url ? 'hidden' : 'flex'}`}>
+              {review.author_name.charAt(0).toUpperCase()}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="font-semibold text-gray-800 truncate text-sm md:text-base">
+                {review.author_name}
+              </p>
+              <p className="text-xs text-gray-500">{review.relative_time_description}</p>
+            </div>
+          </div>
+          <div className="flex ml-2">
             {[...Array(5)].map((_, i) => (
               <Star
                 key={i}
@@ -76,18 +81,45 @@ const ReviewCard = ({ review, index }: ReviewCardProps) => {
               />
             ))}
           </div>
-          <span className="text-xs text-gray-500 font-medium">{review.source}</span>
         </div>
-        <p className="text-gray-600 mb-3 md:mb-4 italic leading-relaxed text-sm md:text-base line-clamp-6">&ldquo;{review.text}&rdquo;</p>
+
+        {/* Review text */}
+        <p className="text-gray-600 mb-3 md:mb-4 leading-relaxed text-sm md:text-base line-clamp-6">
+          &ldquo;{review.text}&rdquo;
+        </p>
       </div>
-      <div className="border-t pt-3 md:pt-4">
-        <p className="font-semibold font-serif text-gray-800 text-sm md:text-base">- {review.name}</p>
+
+      {/* Footer */}
+      <div className="border-t pt-3 md:pt-4 flex justify-between items-center">
+        <div className="flex items-center text-xs text-gray-500">
+          <svg className="w-4 h-4 mr-1" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+          </svg>
+          Google Review
+        </div>
+        {review.author_url && (
+          <a 
+            href={review.author_url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-primary hover:text-primary/80 transition-colors"
+          >
+            <ExternalLink className="h-3 w-3" />
+          </a>
+        )}
       </div>
     </motion.div>
   );
 };
 
 export default function ReviewsSection() {
+  const [reviews, setReviews] = useState<GoogleReview[]>([]);
+  const [placeDetails, setPlaceDetails] = useState<GooglePlaceDetails | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [currentStartIndex, setCurrentStartIndex] = useState(0);
   const [isAutoPlaying] = useState(true);
   const [isPaused, setIsPaused] = useState(false);
@@ -105,9 +137,78 @@ export default function ReviewsSection() {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
+  // Fetch Google Reviews
+  useEffect(() => {
+    const fetchGoogleReviews = async () => {
+      try {
+        setLoading(true);
+        
+        // Llamar a nuestra API route
+        const response = await fetch('/api/google-reviews');
+
+        if (!response.ok) {
+          throw new Error(`API error: ${response.status}`);
+        }
+
+        const data = await response.json();
+        
+        if (data.error) {
+          throw new Error(data.error);
+        }
+
+        setPlaceDetails(data);
+        // Filtrar solo reviews de 5 estrellas
+        const fiveStarReviews = (data.reviews || []).filter((review: GoogleReview) => review.rating === 5);
+        setReviews(fiveStarReviews);
+        setError(null);
+        console.log(`Loaded ${fiveStarReviews.length} 5-star Google reviews`);
+      } catch (err) {
+        console.error('Error fetching Google reviews:', err);
+        setError(err instanceof Error ? err.message : 'Failed to load Google reviews');
+        
+        // Fallback to original static reviews (all 5 stars)
+        const fallbackReviews = [
+          {
+            author_name: "Ashley Short",
+            rating: 5,
+            text: "The PJ Parsons Presents team was amazing to work with!! From helping set up the day of, making announcements, and playing the best dance songs, the team helped the day run so smoothly! Matt's energy while DJing was awesome for all of our guests!!",
+            relative_time_description: "2 months ago",
+            time: Date.now() / 1000,
+          },
+          {
+            author_name: "Nyssa W.",
+            rating: 5,
+            text: "Seriously, stop looking and hire this company. Beyond outstanding, I had an amazing experience with them. I love that you get a day of coordinator and a DJ when you use this company! The DJ/MCs were absolutely fantastic as well.",
+            relative_time_description: "3 months ago",
+            time: Date.now() / 1000,
+          },
+          {
+            author_name: "Madison",
+            rating: 5,
+            text: "We had PJ Parsons as our DJ for our wedding, as well as for our day of coordinator! PJ's crew was ON IT for MC and DJing! They were fun, polite and knew exactly what the crowd needed, and when. They kept our night flowing seamlessly!",
+            relative_time_description: "4 months ago",
+            time: Date.now() / 1000,
+          },
+        ];
+        
+        setReviews(fallbackReviews);
+        setPlaceDetails({
+          name: "PJ Parsons Presents",
+          rating: 4.9,
+          user_ratings_total: 120,
+          reviews: fallbackReviews,
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchGoogleReviews();
+  }, []);
+
   // Auto-slide cada 4 segundos
   useEffect(() => {
-    if (!isAutoPlaying || isPaused) return;
+    if (!isAutoPlaying || isPaused || reviews.length === 0) return;
     
     const interval = setInterval(() => {
       setCurrentStartIndex((prev) => {
@@ -117,7 +218,7 @@ export default function ReviewsSection() {
     }, 4000);
 
     return () => clearInterval(interval);
-  }, [isAutoPlaying, isPaused, isMobile]);
+  }, [isAutoPlaying, isPaused, isMobile, reviews.length]);
 
   const nextSlide = () => {
     const itemsToShow = isMobile ? 1 : 3;
@@ -158,6 +259,25 @@ export default function ReviewsSection() {
     return Math.max(1, reviews.length - itemsToShow + 1);
   };
 
+  // Loading state
+  if (loading) {
+    return (
+      <section id="reviews" className="py-16 md:py-24 lg:py-32 px-4 md:px-6 bg-gradient-to-b from-secondary/10 to-accent/10">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-2xl md:text-3xl lg:text-4xl font-serif font-bold mb-4">What Our Clients Say</h2>
+          </div>
+          <div className="flex justify-center items-center py-20">
+            <div className="text-center">
+              <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto mb-4" />
+              <p className="text-gray-600">Loading Google reviews...</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section 
       id="reviews" 
@@ -177,20 +297,26 @@ export default function ReviewsSection() {
           >
             What Our Clients Say
           </motion.h2>
-          <motion.div 
-            className="flex justify-center items-center mb-3 md:mb-4"
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
-            viewport={{ once: true }}
-          >
-            <div className="flex">
-              {[...Array(5)].map((_, i) => (
-                <Star key={i} className="h-4 w-4 md:h-5 md:w-5 lg:h-6 lg:w-6 text-yellow-400 fill-yellow-400" />
-              ))}
-            </div>
-            <span className="ml-2 font-medium text-sm md:text-base">4.9 out of 5 based on over 120 reviews</span>
-          </motion.div>
+          
+          {placeDetails && (
+            <motion.div 
+              className="flex justify-center items-center mb-3 md:mb-4"
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
+              viewport={{ once: true }}
+            >
+              <div className="flex">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className="h-4 w-4 md:h-5 md:w-5 lg:h-6 lg:w-6 text-yellow-400 fill-yellow-400" />
+                ))}
+              </div>
+              <span className="ml-2 font-medium text-sm md:text-base">
+                {placeDetails.rating} out of 5 based on {placeDetails.user_ratings_total}+ Google reviews
+              </span>
+            </motion.div>
+          )}
+          
           <motion.p
             className="text-gray-600 max-w-2xl mx-auto text-sm md:text-base"
             initial={{ opacity: 0, y: 20 }}
@@ -198,8 +324,19 @@ export default function ReviewsSection() {
             transition={{ duration: 0.6, delay: 0.3, ease: "easeOut" }}
             viewport={{ once: true }}
           >
-            Don&apos;t just take our word for it. Here&apos;s what couples have to say about their experience with PJ Parsons Presents.
+            Real reviews from real couples who trusted us with their special day.
           </motion.p>
+
+          {error && (
+            <motion.div
+              className="mt-4 text-sm text-amber-600 bg-amber-50 border border-amber-200 rounded-lg p-3 max-w-md mx-auto"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+            >
+              <AlertCircle className="h-4 w-4 inline mr-2" />
+              Showing backup reviews. Google reviews will load soon.
+            </motion.div>
+          )}
         </div>
 
         {/* Container de reviews */}
@@ -237,7 +374,7 @@ export default function ReviewsSection() {
               <AnimatePresence mode="wait">
                 {getVisibleReviews().map((review, index) => (
                   <ReviewCard
-                    key={`${review.id}-${currentStartIndex}`}
+                    key={`${review.author_name}-${review.time}-${currentStartIndex}`}
                     review={review}
                     index={index}
                   />
@@ -269,15 +406,28 @@ export default function ReviewsSection() {
             ))}
           </motion.div>
 
-          {/* Información adicional para móvil */}
-          {isMobile && (
+          {/* Link to Google Reviews */}
+          {placeDetails?.url && (
             <motion.div 
-              className="text-center mt-4 text-xs text-gray-500"
+              className="text-center mt-6"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 1.2 }}
             >
-              <p>Swipe or use arrows to see more reviews</p>
+              <a 
+                href={placeDetails.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center text-sm text-primary hover:text-primary/80 transition-colors"
+              >
+                <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                  <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                  <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                  <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                </svg>
+                See all reviews on Google
+              </a>
             </motion.div>
           )}
         </div>
