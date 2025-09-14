@@ -58,8 +58,10 @@ const ServiceCard = ({ title, description, image, delay, color, isFullWidth = fa
         y: -8,
         transition: { duration: 0.15 }
       }}
-      whileTap={{ scale: 0.98 }}
-      transition={{ duration: 0.08 }}
+      whileTap={{ 
+        scale: 0.98,
+        transition: { duration: 0.08 }
+      }}
       className="h-full cursor-pointer"
       onClick={() => scrollToSection("#contact")}
     >
