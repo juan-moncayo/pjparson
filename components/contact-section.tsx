@@ -82,40 +82,6 @@ export default function ContactSection() {
     message: string;
   } | null>(null);
 
-  // Cargar script de HoneyBook en el fondo
-  useEffect(() => {
-    const loadHoneyBookScript = () => {
-      // Declarar el tipo directamente aquí
-      if (!(window as any)._HB_) {
-        (window as any)._HB_ = {};
-      }
-      (window as any)._HB_.pid = "5e555e131a88e4001f5b189c";
-
-      (function(h: any, b: Document, s: string, n: string, i: string) {
-        h._HB_ = h._HB_ || {};
-        h._HB_.pid = i;
-        const t = b.createElement(s) as HTMLScriptElement;
-        t.type = "text/javascript";
-        t.async = true;
-        t.src = n;
-        const e = b.getElementsByTagName(s)[0];
-        if (e && e.parentNode) {
-          e.parentNode.insertBefore(t, e);
-        }
-      })(window, document, "script", "https://widget.honeybook.com/assets_users_production/websiteplacements/placement-controller.min.js", "5e555e131a88e4001f5b189c");
-
-      // Pixel de tracking
-      const trackingPixel = document.createElement('img');
-      trackingPixel.height = 1;
-      trackingPixel.width = 1;
-      trackingPixel.style.display = 'none';
-      trackingPixel.src = `https://www.honeybook.com/p.png?pid=5e555e131a88e4001f5b189c`;
-      document.head.appendChild(trackingPixel);
-    };
-
-    loadHoneyBookScript();
-  }, []);
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -127,28 +93,6 @@ export default function ContactSection() {
     setTimeout(() => {
       setStatusMessage(null);
     }, delay);
-  };
-
-  const submitToHoneyBook = async (formData: any) => {
-    try {
-      // Intentar usar la API de HoneyBook directamente si está disponible
-      const hb = (window as any)._HB_;
-      if (hb && hb.submitLead) {
-        return await hb.submitLead(formData);
-      }
-
-      // Fallback: crear un lead a través de un iframe oculto o postMessage
-      const honeyBookContainer = document.createElement('div');
-      honeyBookContainer.className = 'hb-p-5e555e131a88e4001f5b189c-1';
-      honeyBookContainer.style.display = 'none';
-      document.body.appendChild(honeyBookContainer);
-
-      // Simular el envío exitoso (HoneyBook manejará el resto en el fondo)
-      return { success: true, source: 'honeybook_integrated' };
-    } catch (error) {
-      console.error('HoneyBook integration error:', error);
-      throw error;
-    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -175,42 +119,34 @@ export default function ContactSection() {
         return;
       }
 
-      // Intentar enviar a través de HoneyBook
-      try {
-        await submitToHoneyBook(formData);
-        showMessage('success', '🎉 Perfect! Your inquiry was sent successfully. We\'ll contact you within 24 hours to schedule your free consultation.');
-      } catch (honeyBookError) {
-        // Si HoneyBook falla, usar la API de respaldo
-        const response = await fetch('/api/honeybook-contact', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(formData),
-        });
-
-        const result = await response.json();
-
-        if (response.ok && result.success) {
-          showMessage('success', '✨ Your inquiry was sent successfully! We\'ll contact you within 24 hours.');
-        } else {
-          throw new Error(result.error || 'Server error');
-        }
-      }
-
-      // Limpiar formulario solo si fue exitoso
-      setFormData({
-        name: "",
-        email: "",
-        phone: "",
-        eventDate: "",
-        location: "",
-        services: "",
-        message: "",
-        howHeard: "",
+      // Enviar a través de la API de respaldo que funciona
+      const response = await fetch('/api/honeybook-contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
       });
 
-      // NO hacer scroll automático - mantener posición actual
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        showMessage('success', '🎉 Perfect! Your inquiry was sent successfully. We\'ll contact you within 24 hours to schedule your free consultation.');
+        
+        // Limpiar formulario solo si fue exitoso
+        setFormData({
+          name: "",
+          email: "",
+          phone: "",
+          eventDate: "",
+          location: "",
+          services: "",
+          message: "",
+          howHeard: "",
+        });
+      } else {
+        throw new Error(result.error || 'Server error');
+      }
 
     } catch (error) {
       console.error('Form submission error:', error);
@@ -548,9 +484,6 @@ export default function ContactSection() {
           </div>
         </div>
       </section>
-
-      {/* Container oculto para HoneyBook */}
-      <div className="hb-p-5e555e131a88e4001f5b189c-1" style={{ display: 'none' }}></div>
     </>
   );
 }
