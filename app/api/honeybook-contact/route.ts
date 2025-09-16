@@ -48,13 +48,24 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Obtener credenciales de HoneyBook desde variables de entorno
-    const honeyBookApiKey = process.env.HONEYBOOK_API_KEY;
-    const honeyBookProjectTypeId = process.env.HONEYBOOK_PROJECT_TYPE_ID;
+    // Log detallado para debug
+    console.log('📧 PROCESSING CONTACT FORM:', {
+      timestamp: new Date().toISOString(),
+      name: formData.name,
+      email: formData.email,
+      phone: formData.phone || 'Not provided',
+      eventDate: formData.eventDate || 'Not provided',
+      location: formData.location || 'Not provided',
+      services: formData.services || 'Not specified',
+      howHeard: formData.howHeard || 'Not specified',
+      message: formData.message.substring(0, 100) + '...',
+      honeyBookApiKey: honeyBookApiKey ? 'Present' : 'Missing',
+      honeyBookProjectTypeId: honeyBookProjectTypeId ? 'Present' : 'Missing'
+    });
 
     // Si no hay credenciales de HoneyBook, usar fallback por email
     if (!honeyBookApiKey || !honeyBookProjectTypeId) {
-      console.log('HoneyBook credentials not configured, using email fallback');
+      console.log('❌ HoneyBook credentials not configured, using email fallback');
       await sendEmailFallback(formData);
       
       return NextResponse.json({
