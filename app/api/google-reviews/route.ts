@@ -86,7 +86,7 @@ export async function GET() {
     // Fallback data in case of API failure
     const fallbackData: GooglePlaceDetails = {
       name: "PJ Parsons Presents",
-      rating: 4.9,
+      rating: 5,
       user_ratings_total: 120,
       reviews: [
         {
