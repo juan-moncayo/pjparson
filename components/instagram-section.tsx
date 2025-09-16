@@ -13,7 +13,7 @@ interface InstagramPost {
   timestamp: string;
   like_count?: number;
   comments_count?: number;
-  thumbnail_url?: string; // Para videos
+  thumbnail_url?: string;
 }
 
 interface InstagramPostProps {
@@ -169,44 +169,38 @@ export default function InstagramSection() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showAll, setShowAll] = useState(false);
+  const [isFallback, setIsFallback] = useState(false);
 
   useEffect(() => {
     const fetchInstagramPosts = async () => {
       try {
         setLoading(true);
-        const accessToken = process.env.NEXT_PUBLIC_INSTAGRAM_ACCESS_TOKEN;
         
-        if (!accessToken) {
-          throw new Error('Instagram access token not found');
-        }
-
-        const response = await fetch(
-          `https://graph.instagram.com/me/media?fields=id,media_url,media_type,permalink,caption,timestamp,like_count,comments_count,thumbnail_url&access_token=${accessToken}&limit=12`
-        );
+        // Llamar a nuestra API route instead del endpoint directo
+        const response = await fetch('/api/instagram');
 
         if (!response.ok) {
-          throw new Error(`Instagram API error: ${response.status}`);
+          throw new Error(`API error: ${response.status}`);
         }
 
         const data = await response.json();
         
         if (data.error) {
-          throw new Error(data.error.message);
+          throw new Error(data.error);
         }
 
-        // Filter only images and videos (exclude some problematic media types)
-        const filteredPosts = data.data.filter((post: InstagramPost) => 
-          post.media_type === 'IMAGE' || post.media_type === 'VIDEO' || post.media_type === 'CAROUSEL_ALBUM'
-        );
-
-        setPosts(filteredPosts);
+        setPosts(data.posts || []);
+        setIsFallback(data.fallback || false);
         setError(null);
+        
+        console.log(`Successfully loaded ${data.posts?.length || 0} Instagram posts${data.fallback ? ' (fallback data)' : ''}`);
       } catch (err) {
         console.error('Error fetching Instagram posts:', err);
         setError(err instanceof Error ? err.message : 'Failed to load Instagram posts');
         
-        // Fallback to placeholder data if API fails
+        // Set fallback posts if API completely fails
         setPosts([]);
+        setIsFallback(true);
       } finally {
         setLoading(false);
       }
@@ -303,6 +297,18 @@ export default function InstagramSection() {
           >
             Check out our latest wedding events and behind-the-scenes moments on Instagram.
           </motion.p>
+          
+          {/* Mostrar aviso si son datos de fallback */}
+          {isFallback && (
+            <motion.div
+              className="mt-4 text-sm text-amber-600 bg-amber-50 border border-amber-200 rounded-lg p-3 max-w-md mx-auto"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+            >
+              <AlertCircle className="h-4 w-4 inline mr-2" />
+              Showing sample posts. Live Instagram feed will load soon.
+            </motion.div>
+          )}
         </div>
 
         {posts.length > 0 ? (

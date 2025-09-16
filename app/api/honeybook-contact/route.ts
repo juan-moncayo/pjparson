@@ -48,6 +48,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Obtener variables de entorno
+    const honeyBookApiKey = process.env.HONEYBOOK_API_KEY;
+    const honeyBookProjectTypeId = process.env.HONEYBOOK_PROJECT_TYPE_ID;
+
     // Log detallado para debug
     console.log('📧 PROCESSING CONTACT FORM:', {
       timestamp: new Date().toISOString(),
@@ -71,7 +75,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({
         success: true,
         source: 'email_fallback',
-        message: 'Your inquiry was sent successfully!'
+        message: 'Your inquiry was sent successfully! We will contact you within 24 hours.'
       });
     }
 
@@ -120,6 +124,7 @@ EVENT DETAILS:
 SUBMISSION INFO:
 - Form submitted: ${new Date().toLocaleString()}
 - Source: PJ Parsons Website Contact Form
+- Website: ${request.headers.get('origin') || 'pjparson.vercel.app'}
       `.trim(),
       source: 'PJ Parsons Website',
       customFields: {
@@ -127,9 +132,16 @@ SUBMISSION INFO:
         howHeardAboutUs: formData.howHeard,
         originalMessage: formData.message,
         submissionDate: new Date().toISOString(),
-        websiteSource: 'pjparson.vercel.app'
+        websiteSource: request.headers.get('origin') || 'pjparson.vercel.app',
+        userAgent: request.headers.get('user-agent') || 'Unknown'
       }
     };
+
+    console.log('🚀 Sending to HoneyBook API:', {
+      endpoint: 'https://api.honeybook.com/v1/leads',
+      payloadSize: JSON.stringify(honeyBookPayload).length,
+      projectType: honeyBookProjectTypeId
+    });
 
     // Enviar a HoneyBook API
     const honeyBookResponse = await fetch('https://api.honeybook.com/v1/leads', {
@@ -143,12 +155,14 @@ SUBMISSION INFO:
       body: JSON.stringify(honeyBookPayload)
     });
 
+    const responseText = await honeyBookResponse.text();
+    
     if (!honeyBookResponse.ok) {
-      const errorText = await honeyBookResponse.text();
-      console.error('HoneyBook API Error:', {
+      console.error('❌ HoneyBook API Error:', {
         status: honeyBookResponse.status,
         statusText: honeyBookResponse.statusText,
-        response: errorText
+        response: responseText,
+        headers: Object.fromEntries(honeyBookResponse.headers.entries())
       });
 
       // Si HoneyBook falla, usar email como backup
@@ -157,21 +171,36 @@ SUBMISSION INFO:
       return NextResponse.json({
         success: true,
         source: 'email_backup',
-        message: 'Your inquiry was sent successfully!'
+        message: 'Your inquiry was sent successfully! We will contact you within 24 hours.',
+        debug: process.env.NODE_ENV === 'development' ? {
+          honeyBookError: responseText,
+          status: honeyBookResponse.status
+        } : undefined
       });
     }
 
-    const result = await honeyBookResponse.json();
+    let result;
+    try {
+      result = JSON.parse(responseText);
+    } catch (parseError) {
+      console.error('❌ Failed to parse HoneyBook response:', parseError);
+      result = { id: 'unknown', message: 'Response received but could not parse' };
+    }
+
+    console.log('✅ HoneyBook success:', {
+      leadId: result.id || 'unknown',
+      status: honeyBookResponse.status
+    });
     
     return NextResponse.json({
       success: true,
       source: 'honeybook',
       leadId: result.id || 'created',
-      message: 'Your inquiry was sent to HoneyBook successfully!'
+      message: '🎉 Perfect! Your inquiry was sent to our booking system successfully. We will contact you within 24 hours to schedule your free consultation!'
     });
 
   } catch (error) {
-    console.error('Contact form processing error:', error);
+    console.error('❌ Contact form processing error:', error);
     
     // En caso de cualquier error, intentar email de respaldo
     try {
@@ -181,15 +210,19 @@ SUBMISSION INFO:
       return NextResponse.json({
         success: true,
         source: 'email_emergency',
-        message: 'Your inquiry was sent successfully!'
+        message: 'Your inquiry was sent successfully! We will contact you within 24 hours.'
       });
     } catch (fallbackError) {
-      console.error('Email fallback also failed:', fallbackError);
+      console.error('❌ Email fallback also failed:', fallbackError);
       
       return NextResponse.json(
         { 
-          error: 'Unable to process your inquiry. Please contact us directly at (425) 471-8780.',
-          success: false 
+          error: 'Unable to process your inquiry at this moment. Please contact us directly at (425) 471-8780 or Hello@PJParsonsPresents.com',
+          success: false,
+          fallbackContact: {
+            phone: '(425) 471-8780',
+            email: 'Hello@PJParsonsPresents.com'
+          }
         },
         { status: 500 }
       );
@@ -197,31 +230,65 @@ SUBMISSION INFO:
   }
 }
 
-// Función de respaldo por email
+// Función de respaldo por email - para logging y notificación manual
 async function sendEmailFallback(formData: ContactFormData) {
   try {
-    // Log detallado para el team (pueden revisar logs de Vercel)
-    console.log('📧 EMAIL FALLBACK TRIGGERED:', {
+    // Log estructurado para que el equipo pueda ver los leads
+    console.log('📧 EMAIL FALLBACK - NEW LEAD REQUIRES MANUAL FOLLOW-UP:', {
       timestamp: new Date().toISOString(),
-      name: formData.name,
-      email: formData.email,
-      phone: formData.phone || 'Not provided',
-      eventDate: formData.eventDate || 'Not provided',
-      location: formData.location || 'Not provided',
-      services: formData.services || 'Not specified',
-      howHeard: formData.howHeard || 'Not specified',
-      message: formData.message,
-      messageLength: formData.message.length
+      priority: 'HIGH',
+      leadData: {
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone || 'Not provided',
+        eventDate: formData.eventDate || 'Not provided',
+        location: formData.location || 'Not provided',
+        services: formData.services || 'Not specified',
+        howHeard: formData.howHeard || 'Not specified',
+        message: formData.message,
+        messageLength: formData.message.length
+      },
+      action: 'MANUAL_FOLLOWUP_REQUIRED',
+      contactMethods: {
+        email: formData.email,
+        phone: formData.phone || null
+      }
     });
 
-    // Aquí puedes integrar con servicios como Resend, SendGrid, etc.
-    // Por ahora solo logueamos la información
-
-    console.log('📨 New lead needs manual follow-up:', formData.email);
+    // Aquí se puede integrar con servicios como:
+    // - Resend, SendGrid, Mailgun para envío de emails
+    // - Slack notifications
+    // - Discord webhooks
+    // - Microsoft Teams notifications
+    // - Zapier webhooks
+    
+    // Ejemplo de webhook a Slack (comentado):
+    /*
+    if (process.env.SLACK_WEBHOOK_URL) {
+      await fetch(process.env.SLACK_WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          text: `🚨 New Wedding Lead - Manual Follow-up Required`,
+          blocks: [
+            {
+              type: "section",
+              text: {
+                type: "mrkdwn",
+                text: `*New Wedding Lead*\n*Name:* ${formData.name}\n*Email:* ${formData.email}\n*Phone:* ${formData.phone || 'Not provided'}\n*Event Date:* ${formData.eventDate || 'Not specified'}\n*Services:* ${formData.services || 'Not specified'}`
+              }
+            }
+          ]
+        })
+      });
+    }
+    */
+    
+    console.log('📨 Lead logged for manual follow-up:', formData.email);
     
     return { success: true };
   } catch (error) {
-    console.error('Email fallback error:', error);
+    console.error('❌ Email fallback error:', error);
     return { success: false };
   }
 }
@@ -231,7 +298,8 @@ export async function GET() {
   return NextResponse.json(
     { 
       error: 'Method not allowed. Use POST to submit contact form.',
-      success: false 
+      success: false,
+      allowedMethods: ['POST', 'OPTIONS']
     },
     { status: 405 }
   );
@@ -243,7 +311,18 @@ export async function OPTIONS() {
     headers: {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Methods': 'POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+      'Access-Control-Max-Age': '86400',
+    },
+  });
+}
+
+// Health check endpoint
+export async function HEAD() {
+  return new NextResponse(null, {
+    status: 200,
+    headers: {
+      'Content-Type': 'application/json',
     },
   });
 }

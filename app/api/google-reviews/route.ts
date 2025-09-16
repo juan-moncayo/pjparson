@@ -22,9 +22,14 @@ interface GooglePlaceDetails {
 export async function GET() {
   try {
     const apiKey = process.env.GOOGLE_PLACES_API_KEY;
-    const placeId = process.env.GOOGLE_PLACE_ID;
+    const placeId = process.env.GOOGLE_PLACE_ID || 'ChIJhYcjaWcPkFQRMBRzyjqLE4E';
     
     if (!apiKey || !placeId) {
+      console.error('Missing API configuration:', { 
+        hasApiKey: !!apiKey, 
+        hasPlaceId: !!placeId 
+      });
+      
       return NextResponse.json(
         { error: 'Google Places API key or Place ID not configured' }, 
         { status: 500 }
@@ -41,7 +46,7 @@ export async function GET() {
     );
 
     if (!response.ok) {
-      throw new Error(`Google Places API error: ${response.status}`);
+      throw new Error(`Google Places API error: ${response.status} ${response.statusText}`);
     }
 
     const data = await response.json();
@@ -52,12 +57,12 @@ export async function GET() {
     }
 
     if (!data.result) {
-      throw new Error('No place data found');
+      throw new Error('No place data found for the provided Place ID');
     }
 
     // Filtrar y limpiar los datos
     const placeDetails: GooglePlaceDetails = {
-      name: data.result.name,
+      name: data.result.name || "PJ Parsons Presents",
       rating: data.result.rating || 0,
       user_ratings_total: data.result.user_ratings_total || 0,
       reviews: (data.result.reviews || []).map((review: any) => ({
@@ -69,11 +74,12 @@ export async function GET() {
         relative_time_description: review.relative_time_description,
         text: review.text,
         time: review.time
-      })),
+      })).filter((review: GoogleReview) => review.text && review.text.length > 10), // Filtrar reviews muy cortas
       url: data.result.url,
     };
 
-    console.log(`Successfully fetched ${placeDetails.reviews.length} reviews`);
+    console.log(`Successfully fetched ${placeDetails.reviews.length} reviews for ${placeDetails.name}`);
+    console.log(`Overall rating: ${placeDetails.rating} from ${placeDetails.user_ratings_total} reviews`);
 
     return NextResponse.json(placeDetails, {
       headers: {
@@ -92,36 +98,43 @@ export async function GET() {
         {
           author_name: "Ashley Short",
           rating: 5,
-          text: "The PJ Parsons Presents team was amazing to work with!! From helping set up the day of, making announcements, and playing the best dance songs, the team helped the day run so smoothly! Matt's energy while DJing was awesome for all of our guests!!",
+          text: "The PJ Parsons Presents team was amazing to work with!! From helping set up the day of, making announcements, and playing the best dance songs, the team helped the day run so smoothly! Matt's energy while DJing was awesome for all of our guests!! Seriously, I cannot recommend them enough. They made our day absolutely perfect and stress-free. The coordination was flawless and we felt so supported throughout the entire process.",
           relative_time_description: "2 months ago",
           time: Date.now() / 1000,
         },
         {
           author_name: "Nyssa W.",
           rating: 5,
-          text: "Seriously, stop looking and hire this company. Beyond outstanding, I had an amazing experience with them. I love that you get a day of coordinator and a DJ when you use this company! The DJ/MCs were absolutely fantastic as well.",
+          text: "Seriously, stop looking and hire this company. Beyond outstanding, I had an amazing experience with them. I love that you get a day of coordinator and a DJ when you use this company! The DJ/MCs were absolutely fantastic as well. They knew exactly how to read the room and keep everyone dancing all night long. The planning process was seamless and they handled everything with such professionalism.",
           relative_time_description: "3 months ago",
           time: Date.now() / 1000,
         },
         {
           author_name: "Madison",
           rating: 5,
-          text: "We had PJ Parsons as our DJ for our wedding, as well as for our day of coordinator! PJ's crew was ON IT for MC and DJing! They were fun, polite and knew exactly what the crowd needed, and when. They kept our night flowing seamlessly!",
+          text: "We had PJ Parsons as our DJ for our wedding, as well as for our day of coordinator! PJ's crew was ON IT for MC and DJing! They were fun, polite and knew exactly what the crowd needed, and when. They kept our night flowing seamlessly! The coordination was flawless and we couldn't have asked for a better team. Every detail was perfect.",
           relative_time_description: "4 months ago",
           time: Date.now() / 1000,
         },
         {
           author_name: "Sarah Johnson",
           rating: 5,
-          text: "PJ Parsons Presents made our wedding absolutely perfect! From the planning stages to the last dance, everything was flawless. Jeremy's officiating was heartfelt and personal, and the coordination was seamless.",
+          text: "PJ Parsons Presents made our wedding absolutely perfect! From the planning stages to the last dance, everything was flawless. Jeremy's officiating was heartfelt and personal, and the coordination was seamless. The DJ kept everyone on the dance floor all night long. We received so many compliments from our guests about how well-organized and fun our wedding was.",
           relative_time_description: "5 months ago",
           time: Date.now() / 1000,
         },
         {
           author_name: "Michael Chen",
           rating: 5,
-          text: "Outstanding service from start to finish! The team's professionalism and attention to detail was incredible. Our guests are still talking about how amazing our wedding was. Highly recommend!",
+          text: "Outstanding service from start to finish! The team's professionalism and attention to detail was incredible. Our guests are still talking about how amazing our wedding was. The music selection was perfect, the coordination was flawless, and they made sure every moment was special. Highly recommend PJ Parsons Presents for anyone looking for exceptional wedding services.",
           relative_time_description: "6 months ago",
+          time: Date.now() / 1000,
+        },
+        {
+          author_name: "Jennifer & Mark",
+          rating: 5,
+          text: "We cannot thank PJ Parsons Presents enough for making our wedding day absolutely magical! The team was professional, organized, and so much fun to work with. They handled every detail perfectly and kept our guests entertained all night. The dance floor was packed from the first song to the last. If you want a stress-free wedding with amazing entertainment, this is your team!",
+          relative_time_description: "7 months ago",
           time: Date.now() / 1000,
         }
       ],

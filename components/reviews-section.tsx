@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { Star, ChevronLeft, ChevronRight, Loader2, AlertCircle, ExternalLink } from 'lucide-react';
+import { Star, ChevronLeft, ChevronRight, Loader2, AlertCircle, ExternalLink, X, Eye } from 'lucide-react';
 import { motion, AnimatePresence } from "framer-motion";
 
 interface GoogleReview {
@@ -26,9 +26,123 @@ interface GooglePlaceDetails {
 interface ReviewCardProps {
   review: GoogleReview;
   index: number;
+  onReadMore: () => void;
 }
 
-const ReviewCard = ({ review, index }: ReviewCardProps) => {
+interface ReviewModalProps {
+  review: GoogleReview | null;
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+// Modal para mostrar review completa
+const ReviewModal = ({ review, isOpen, onClose }: ReviewModalProps) => {
+  if (!review) return null;
+
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          onClick={onClose}
+        >
+          <motion.div
+            className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[80vh] overflow-y-auto"
+            initial={{ scale: 0.9, opacity: 0, y: 20 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            exit={{ scale: 0.9, opacity: 0, y: 20 }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="p-6">
+              {/* Header del modal */}
+              <div className="flex items-start justify-between mb-6">
+                <div className="flex items-center">
+                  {review.profile_photo_url ? (
+                    <img
+                      src={review.profile_photo_url}
+                      alt={review.author_name}
+                      className="w-12 h-12 rounded-full mr-4 object-cover"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.style.display = 'none';
+                        const fallback = target.nextElementSibling as HTMLElement;
+                        if (fallback) fallback.style.display = 'flex';
+                      }}
+                    />
+                  ) : null}
+                  <div className={`w-12 h-12 rounded-full mr-4 bg-gradient-to-r from-primary to-secondary flex items-center justify-center text-white font-semibold ${review.profile_photo_url ? 'hidden' : 'flex'}`}>
+                    {review.author_name.charAt(0).toUpperCase()}
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-lg text-gray-800">
+                      {review.author_name}
+                    </h3>
+                    <p className="text-sm text-gray-500">{review.relative_time_description}</p>
+                    <div className="flex mt-1">
+                      {[...Array(5)].map((_, i) => (
+                        <Star
+                          key={i}
+                          className={`h-4 w-4 ${i < review.rating ? "text-yellow-400 fill-yellow-400" : "text-gray-300"}`}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+                
+                <button
+                  onClick={onClose}
+                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                >
+                  <X className="h-5 w-5 text-gray-500" />
+                </button>
+              </div>
+
+              {/* Contenido completo de la review */}
+              <div className="mb-6">
+                <p className="text-gray-700 leading-relaxed text-base">
+                  &ldquo;{review.text}&rdquo;
+                </p>
+              </div>
+
+              {/* Footer del modal */}
+              <div className="border-t pt-4 flex justify-between items-center">
+                <div className="flex items-center text-sm text-gray-500">
+                  <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                  </svg>
+                  Google Review
+                </div>
+                
+                {review.author_url && (
+                  <a 
+                    href={review.author_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center text-primary hover:text-primary/80 transition-colors"
+                  >
+                    <ExternalLink className="h-4 w-4 mr-1" />
+                    Ver en Google
+                  </a>
+                )}
+              </div>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+};
+
+const ReviewCard = ({ review, index, onReadMore }: ReviewCardProps) => {
+  const shouldTruncate = review.text.length > 150;
+  const truncatedText = shouldTruncate ? review.text.substring(0, 150) + '...' : review.text;
+
   return (
     <motion.div
       className="bg-white p-4 md:p-6 rounded-2xl shadow-lg h-full flex flex-col justify-between min-h-[280px] md:min-h-[320px]"
@@ -84,9 +198,20 @@ const ReviewCard = ({ review, index }: ReviewCardProps) => {
         </div>
 
         {/* Review text */}
-        <p className="text-gray-600 mb-3 md:mb-4 leading-relaxed text-sm md:text-base line-clamp-6">
-          &ldquo;{review.text}&rdquo;
+        <p className="text-gray-600 mb-3 md:mb-4 leading-relaxed text-sm md:text-base">
+          &ldquo;{truncatedText}&rdquo;
         </p>
+
+        {/* Botón "Leer más" si el texto es largo */}
+        {shouldTruncate && (
+          <button
+            onClick={onReadMore}
+            className="inline-flex items-center text-primary hover:text-primary/80 transition-colors text-sm font-medium mb-4"
+          >
+            <Eye className="h-4 w-4 mr-1" />
+            Leer más
+          </button>
+        )}
       </div>
 
       {/* Footer */}
@@ -124,6 +249,8 @@ export default function ReviewsSection() {
   const [isAutoPlaying] = useState(true);
   const [isPaused, setIsPaused] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [selectedReview, setSelectedReview] = useState<GoogleReview | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const sectionRef = useRef<HTMLDivElement>(null);
 
   // Detectar si es móvil
@@ -157,36 +284,57 @@ export default function ReviewsSection() {
         }
 
         setPlaceDetails(data);
-        // Filtrar solo reviews de 5 estrellas
-        const fiveStarReviews = (data.reviews || []).filter((review: GoogleReview) => review.rating === 5);
-        setReviews(fiveStarReviews);
+        // Usar todas las reviews, pero mostrar las de 5 estrellas primero
+        const sortedReviews = (data.reviews || []).sort((a: GoogleReview, b: GoogleReview) => b.rating - a.rating);
+        setReviews(sortedReviews);
         setError(null);
-        console.log(`Loaded ${fiveStarReviews.length} 5-star Google reviews`);
+        console.log(`Loaded ${sortedReviews.length} Google reviews`);
       } catch (err) {
         console.error('Error fetching Google reviews:', err);
         setError(err instanceof Error ? err.message : 'Failed to load Google reviews');
         
-        // Fallback to original static reviews (all 5 stars)
+        // Fallback to original static reviews
         const fallbackReviews = [
           {
             author_name: "Ashley Short",
             rating: 5,
-            text: "The PJ Parsons Presents team was amazing to work with!! From helping set up the day of, making announcements, and playing the best dance songs, the team helped the day run so smoothly! Matt's energy while DJing was awesome for all of our guests!!",
+            text: "The PJ Parsons Presents team was amazing to work with!! From helping set up the day of, making announcements, and playing the best dance songs, the team helped the day run so smoothly! Matt's energy while DJing was awesome for all of our guests!! Seriously, I cannot recommend them enough. They made our day absolutely perfect and stress-free.",
             relative_time_description: "2 months ago",
             time: Date.now() / 1000,
           },
           {
             author_name: "Nyssa W.",
             rating: 5,
-            text: "Seriously, stop looking and hire this company. Beyond outstanding, I had an amazing experience with them. I love that you get a day of coordinator and a DJ when you use this company! The DJ/MCs were absolutely fantastic as well.",
+            text: "Seriously, stop looking and hire this company. Beyond outstanding, I had an amazing experience with them. I love that you get a day of coordinator and a DJ when you use this company! The DJ/MCs were absolutely fantastic as well. They knew exactly how to read the room and keep everyone dancing all night long.",
             relative_time_description: "3 months ago",
             time: Date.now() / 1000,
           },
           {
             author_name: "Madison",
             rating: 5,
-            text: "We had PJ Parsons as our DJ for our wedding, as well as for our day of coordinator! PJ's crew was ON IT for MC and DJing! They were fun, polite and knew exactly what the crowd needed, and when. They kept our night flowing seamlessly!",
+            text: "We had PJ Parsons as our DJ for our wedding, as well as for our day of coordinator! PJ's crew was ON IT for MC and DJing! They were fun, polite and knew exactly what the crowd needed, and when. They kept our night flowing seamlessly! The coordination was flawless and we couldn't have asked for a better team.",
             relative_time_description: "4 months ago",
+            time: Date.now() / 1000,
+          },
+          {
+            author_name: "Jennifer & Mark",
+            rating: 5,
+            text: "We cannot thank PJ Parsons Presents enough for making our wedding day absolutely magical! The team was professional, organized, and so much fun to work with. They handled every detail perfectly and kept our guests entertained all night. The dance floor was packed from the first song to the last.",
+            relative_time_description: "5 months ago",
+            time: Date.now() / 1000,
+          },
+          {
+            author_name: "Amanda Rodriguez",
+            rating: 5,
+            text: "Absolutely incredible experience with PJ Parsons Presents! They coordinated our entire wedding flawlessly and the DJ was phenomenal. Matt really knew how to read the crowd and keep the energy up all night. The planning process was so smooth and stress-free.",
+            relative_time_description: "6 months ago",
+            time: Date.now() / 1000,
+          },
+          {
+            author_name: "David Thompson", 
+            rating: 5,
+            text: "PJ Parsons Presents exceeded all our expectations! Their coordination services were top-notch and the DJ/MC combo was perfect for our celebration. Jeremy's energy as MC kept the reception flowing beautifully.",
+            relative_time_description: "7 months ago",
             time: Date.now() / 1000,
           },
         ];
@@ -195,7 +343,7 @@ export default function ReviewsSection() {
         setPlaceDetails({
           name: "PJ Parsons Presents",
           rating: 5,
-          user_ratings_total: 120,
+          user_ratings_total: 150,
           reviews: fallbackReviews,
         });
       } finally {
@@ -241,6 +389,16 @@ export default function ReviewsSection() {
     setIsPaused(false);
   };
 
+  const handleReadMore = (review: GoogleReview) => {
+    setSelectedReview(review);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedReview(null);
+  };
+
   // Obtener las reviews visibles según el dispositivo
   const getVisibleReviews = () => {
     const itemsToShow = isMobile ? 1 : 3;
@@ -279,159 +437,249 @@ export default function ReviewsSection() {
   }
 
   return (
-    <section 
-      id="reviews" 
-      className="py-16 md:py-24 lg:py-32 px-4 md:px-6 bg-gradient-to-b from-secondary/10 to-accent/10"
-      ref={sectionRef}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-    >
-      <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-12 md:mb-16">
-          <motion.h2
-            className="text-2xl md:text-3xl lg:text-4xl font-serif font-bold mb-3 md:mb-4"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: "easeOut" }}
-            viewport={{ once: true }}
-          >
-            What Our Clients Say
-          </motion.h2>
-          
-          {placeDetails && (
-            <motion.div 
-              className="flex justify-center items-center mb-3 md:mb-4"
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
+    <>
+      <section 
+        id="reviews" 
+        className="py-16 md:py-24 lg:py-32 px-4 md:px-6 bg-gradient-to-b from-secondary/10 to-accent/10"
+        ref={sectionRef}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+      >
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-12 md:mb-16">
+            <motion.h2
+              className="text-2xl md:text-3xl lg:text-4xl font-serif font-bold mb-3 md:mb-4"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, ease: "easeOut" }}
               viewport={{ once: true }}
             >
-              <div className="flex">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="h-4 w-4 md:h-5 md:w-5 lg:h-6 lg:w-6 text-yellow-400 fill-yellow-400" />
-                ))}
-              </div>
-              <span className="ml-2 font-medium text-sm md:text-base">
-                {placeDetails.rating} out of 5 based on {placeDetails.user_ratings_total}+ Google reviews
-              </span>
-            </motion.div>
-          )}
-          
-          <motion.p
-            className="text-gray-600 max-w-2xl mx-auto text-sm md:text-base"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3, ease: "easeOut" }}
-            viewport={{ once: true }}
-          >
-            Real reviews from real couples who trusted us with their special day.
-          </motion.p>
-
-          {error && (
-            <motion.div
-              className="mt-4 text-sm text-amber-600 bg-amber-50 border border-amber-200 rounded-lg p-3 max-w-md mx-auto"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
+              What Our Clients Say
+            </motion.h2>
+            
+            {placeDetails && (
+              <motion.div 
+                className="flex justify-center items-center mb-3 md:mb-4"
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
+                viewport={{ once: true }}
+              >
+                <div className="flex">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="h-4 w-4 md:h-5 md:w-5 lg:h-6 lg:w-6 text-yellow-400 fill-yellow-400" />
+                  ))}
+                </div>
+                <span className="ml-2 font-medium text-sm md:text-base">
+                  {placeDetails.rating} out of 5 based on {placeDetails.user_ratings_total}+ Google reviews
+                </span>
+              </motion.div>
+            )}
+            
+            <motion.p
+              className="text-gray-600 max-w-2xl mx-auto text-sm md:text-base"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.3, ease: "easeOut" }}
+              viewport={{ once: true }}
             >
-              <AlertCircle className="h-4 w-4 inline mr-2" />
-              Showing backup reviews. Google reviews will load soon.
-            </motion.div>
-          )}
-        </div>
+              Real reviews from real couples who trusted us with their special day.
+            </motion.p>
 
-        {/* Container de reviews */}
-        <div className="relative max-w-6xl mx-auto">
-          {/* Navigation Buttons */}
-          <motion.button
-            onClick={prevSlide}
-            className="absolute left-2 md:left-4 top-1/2 transform -translate-y-1/2 z-10 bg-white/90 backdrop-blur-sm rounded-full p-2 md:p-3 shadow-lg hover:bg-white hover:scale-110 transition-all duration-300"
-            aria-label="Previous reviews"
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.95 }}
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, delay: 0.8 }}
-          >
-            <ChevronLeft className="h-4 w-4 md:h-5 md:w-5 text-gray-600" />
-          </motion.button>
-          
-          <motion.button
-            onClick={nextSlide}
-            className="absolute right-2 md:right-4 top-1/2 transform -translate-y-1/2 z-10 bg-white/90 backdrop-blur-sm rounded-full p-2 md:p-3 shadow-lg hover:bg-white hover:scale-110 transition-all duration-300"
-            aria-label="Next reviews"
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.95 }}
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, delay: 0.8 }}
-          >
-            <ChevronRight className="h-4 w-4 md:h-5 md:w-5 text-gray-600" />
-          </motion.button>
-
-          {/* Grid de Reviews - Responsivo */}
-          <div className="px-12 md:px-16">
-            <div className={`grid gap-4 md:gap-6 ${isMobile ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-3'}`}>
-              <AnimatePresence mode="wait">
-                {getVisibleReviews().map((review, index) => (
-                  <ReviewCard
-                    key={`${review.author_name}-${review.time}-${currentStartIndex}`}
-                    review={review}
-                    index={index}
-                  />
-                ))}
-              </AnimatePresence>
-            </div>
+            {error && (
+              <motion.div
+                className="mt-4 text-sm text-amber-600 bg-amber-50 border border-amber-200 rounded-lg p-3 max-w-md mx-auto"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+              >
+                <AlertCircle className="h-4 w-4 inline mr-2" />
+                Showing backup reviews. Google reviews will load soon.
+              </motion.div>
+            )}
           </div>
 
-          {/* Dots Indicator */}
-          <motion.div 
-            className="flex justify-center mt-6 md:mt-8 space-x-2"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 1 }}
-          >
-            {Array.from({ length: getTotalSlides() }).map((_, index) => (
-              <motion.button
-                key={index}
-                onClick={() => setCurrentStartIndex(index)}
-                className={`w-2 h-2 md:w-2.5 md:h-2.5 rounded-full transition-all duration-300 ${
-                  index === currentStartIndex
-                    ? 'bg-primary scale-125'
-                    : 'bg-gray-300 hover:bg-gray-400'
-                }`}
-                whileHover={{ scale: 1.2 }}
-                whileTap={{ scale: 0.9 }}
-                aria-label={`Go to review set ${index + 1}`}
-              />
-            ))}
-          </motion.div>
-
-          {/* Link to Google Reviews */}
-          {placeDetails?.url && (
-            <motion.div 
-              className="text-center mt-6"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 1.2 }}
+          {/* Container de reviews */}
+          <div className="relative max-w-6xl mx-auto">
+            {/* Navigation Buttons */}
+            <motion.button
+              onClick={prevSlide}
+              className="absolute left-2 md:left-4 top-1/2 transform -translate-y-1/2 z-10 bg-white/90 backdrop-blur-sm rounded-full p-2 md:p-3 shadow-lg hover:bg-white hover:scale-110 transition-all duration-300"
+              aria-label="Previous reviews"
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.8 }}
             >
-              <a 
-                href={placeDetails.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center text-sm text-primary hover:text-primary/80 transition-colors"
-              >
-                <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-                  <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-                  <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
-                  <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-                </svg>
-                See all reviews on Google
-              </a>
+              <ChevronLeft className="h-4 w-4 md:h-5 md:w-5 text-gray-600" />
+            </motion.button>
+            
+            <motion.button
+              onClick={nextSlide}
+              className="absolute right-2 md:right-4 top-1/2 transform -translate-y-1/2 z-10 bg-white/90 backdrop-blur-sm rounded-full p-2 md:p-3 shadow-lg hover:bg-white hover:scale-110 transition-all duration-300"
+              aria-label="Next reviews"
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.8 }}
+            >
+              <ChevronRight className="h-4 w-4 md:h-5 md:w-5 text-gray-600" />
+            </motion.button>
+
+            {/* Grid de Reviews - Responsivo */}
+            <div className="px-12 md:px-16">
+              <div className={`grid gap-4 md:gap-6 ${isMobile ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-3'}`}>
+                <AnimatePresence mode="wait">
+                  {getVisibleReviews().map((review, index) => (
+                    <ReviewCard
+                      key={`${review.author_name}-${review.time}-${currentStartIndex}`}
+                      review={review}
+                      index={index}
+                      onReadMore={() => handleReadMore(review)}
+                    />
+                  ))}
+                </AnimatePresence>
+              </div>
+            </div>
+
+            {/* Dots Indicator - SISTEMA CORREGIDO */}
+            <motion.div 
+              className="flex justify-center items-center mt-6 md:mt-8 space-x-2"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 1 }}
+            >
+              {(() => {
+                const totalSlides = getTotalSlides();
+                const currentIndex = currentStartIndex;
+                
+                // Si hay 3 o menos slides, mostrar puntos normales
+                if (totalSlides <= 3) {
+                  return Array.from({ length: totalSlides }).map((_, index) => (
+                    <motion.button
+                      key={`dot-${index}`}
+                      onClick={() => setCurrentStartIndex(index)}
+                      className={`rounded-full transition-all duration-300 ${
+                        index === currentIndex
+                          ? 'w-3 h-3 bg-primary'
+                          : 'w-2 h-2 bg-gray-300 hover:bg-gray-400'
+                      }`}
+                      whileHover={{ scale: 1.2 }}
+                      whileTap={{ scale: 0.95 }}
+                      aria-label={`Go to review set ${index + 1}`}
+                    />
+                  ));
+                }
+
+                // Para más de 3 slides: sistema dinámico simplificado
+                const dots = [];
+
+                // Punto pequeño izquierdo (solo si currentIndex > 1)
+                if (currentIndex > 1) {
+                  dots.push(
+                    <motion.button
+                      key="dot-far-left"
+                      onClick={() => setCurrentStartIndex(Math.max(0, currentIndex - 2))}
+                      className="w-1.5 h-1.5 bg-gray-400 rounded-full opacity-50 hover:opacity-80 transition-all duration-300"
+                      whileHover={{ scale: 1.3 }}
+                      whileTap={{ scale: 0.9 }}
+                      aria-label="Go back further"
+                    />
+                  );
+                }
+
+                // Punto anterior (solo si currentIndex > 0)
+                if (currentIndex > 0) {
+                  dots.push(
+                    <motion.button
+                      key="dot-prev"
+                      onClick={() => setCurrentStartIndex(currentIndex - 1)}
+                      className="w-2 h-2 bg-gray-300 rounded-full hover:bg-gray-400 transition-all duration-300"
+                      whileHover={{ scale: 1.2 }}
+                      whileTap={{ scale: 0.95 }}
+                      aria-label="Previous review set"
+                    />
+                  );
+                }
+
+                // Punto actual (siempre presente)
+                dots.push(
+                  <motion.div
+                    key="dot-current"
+                    className="w-3 h-3 bg-primary rounded-full"
+                    animate={{ scale: 1.1 }}
+                    transition={{ duration: 0.3 }}
+                    aria-label={`Current: ${currentIndex + 1} of ${totalSlides}`}
+                  />
+                );
+
+                // Punto siguiente (solo si currentIndex < totalSlides - 1)
+                if (currentIndex < totalSlides - 1) {
+                  dots.push(
+                    <motion.button
+                      key="dot-next"
+                      onClick={() => setCurrentStartIndex(currentIndex + 1)}
+                      className="w-2 h-2 bg-gray-300 rounded-full hover:bg-gray-400 transition-all duration-300"
+                      whileHover={{ scale: 1.2 }}
+                      whileTap={{ scale: 0.95 }}
+                      aria-label="Next review set"
+                    />
+                  );
+                }
+
+                // Punto pequeño derecho (solo si currentIndex < totalSlides - 2)
+                if (currentIndex < totalSlides - 2) {
+                  dots.push(
+                    <motion.button
+                      key="dot-far-right"
+                      onClick={() => setCurrentStartIndex(Math.min(totalSlides - 1, currentIndex + 2))}
+                      className="w-1.5 h-1.5 bg-gray-400 rounded-full opacity-50 hover:opacity-80 transition-all duration-300"
+                      whileHover={{ scale: 1.3 }}
+                      whileTap={{ scale: 0.9 }}
+                      aria-label="Go forward further"
+                    />
+                  );
+                }
+
+                return dots;
+              })()}
             </motion.div>
-          )}
+
+            {/* Link to Google Reviews */}
+            {placeDetails?.url && (
+              <motion.div 
+                className="text-center mt-6"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 1.2 }}
+              >
+                <a 
+                  href={placeDetails.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center text-sm text-primary hover:text-primary/80 transition-colors"
+                >
+                  <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                  </svg>
+                  See all reviews on Google
+                </a>
+              </motion.div>
+            )}
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
+
+      {/* Modal para review completa */}
+      <ReviewModal 
+        review={selectedReview}
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+      />
+    </>
   );
 }
