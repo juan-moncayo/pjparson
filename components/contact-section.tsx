@@ -85,23 +85,24 @@ export default function ContactSection() {
   // Cargar script de HoneyBook en el fondo
   useEffect(() => {
     const loadHoneyBookScript = () => {
-      if (!window._HB_) {
-        window._HB_ = {};
+      // Declarar el tipo directamente aquí
+      if (!(window as any)._HB_) {
+        (window as any)._HB_ = {};
       }
-      window._HB_.pid = "5e555e131a88e4001f5b189c";
+      (window as any)._HB_.pid = "5e555e131a88e4001f5b189c";
 
-      (function(h: any, b: Document, s: string, n: string, i: string, p: any, e: any, t: HTMLScriptElement) {
+      (function(h: any, b: Document, s: string, n: string, i: string) {
         h._HB_ = h._HB_ || {};
         h._HB_.pid = i;
-        t = b.createElement(s) as HTMLScriptElement;
+        const t = b.createElement(s) as HTMLScriptElement;
         t.type = "text/javascript";
         t.async = true;
         t.src = n;
-        e = b.getElementsByTagName(s)[0];
+        const e = b.getElementsByTagName(s)[0];
         if (e && e.parentNode) {
           e.parentNode.insertBefore(t, e);
         }
-      })(window, document, "script", "https://widget.honeybook.com/assets_users_production/websiteplacements/placement-controller.min.js", "5e555e131a88e4001f5b189c", null, null, null as any);
+      })(window, document, "script", "https://widget.honeybook.com/assets_users_production/websiteplacements/placement-controller.min.js", "5e555e131a88e4001f5b189c");
 
       // Pixel de tracking
       const trackingPixel = document.createElement('img');
@@ -131,8 +132,9 @@ export default function ContactSection() {
   const submitToHoneyBook = async (formData: any) => {
     try {
       // Intentar usar la API de HoneyBook directamente si está disponible
-      if (window._HB_ && window._HB_.submitLead) {
-        return await window._HB_.submitLead(formData);
+      const hb = (window as any)._HB_;
+      if (hb && hb.submitLead) {
+        return await hb.submitLead(formData);
       }
 
       // Fallback: crear un lead a través de un iframe oculto o postMessage
@@ -551,15 +553,4 @@ export default function ContactSection() {
       <div className="hb-p-5e555e131a88e4001f5b189c-1" style={{ display: 'none' }}></div>
     </>
   );
-}
-
-// Declarar tipos globales para TypeScript
-declare global {
-  interface Window {
-    _HB_: {
-      pid?: string;
-      submitLead?: (data: any) => Promise<any>;
-      [key: string]: any;
-    };
-  }
 }
