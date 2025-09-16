@@ -115,9 +115,9 @@ const nextConfig: NextConfig = {
     NEXT_PUBLIC_GOOGLE_ANALYTICS_ID: process.env.GOOGLE_ANALYTICS_ID,
   },
 
-  // Optimizaciones adicionales
+  // Optimizaciones adicionales - SIN optimizeCss
   experimental: {
-    optimizeCss: true,
+    // optimizeCss: true, // REMOVIDO - causaba el error
     optimizePackageImports: ['framer-motion', 'lucide-react'],
   },
 
@@ -126,9 +126,9 @@ const nextConfig: NextConfig = {
     removeConsole: process.env.NODE_ENV === 'production',
   },
 
-  // Configuración para el build
-  output: 'standalone',
-  
+  // Configuración para el build - SIN output standalone
+  // output: 'standalone', // REMOVIDO - puede causar problemas en Vercel
+
   // Configuración de redirects si es necesario
   async redirects() {
     return [
