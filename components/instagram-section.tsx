@@ -49,29 +49,15 @@ const InstagramPostCard = ({ post, delay }: InstagramPostProps) => {
       <div className="aspect-square relative">
         {!imageError ? (
           <div className="relative w-full h-full">
-            {/* Para videos, usar un elemento video con poster/thumbnail */}
-            {post.media_type === 'VIDEO' ? (
-              <video
-                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                muted
-                playsInline
-                preload="metadata"
-                poster={post.thumbnail_url || undefined}
-                onError={() => setImageError(true)}
-                style={{ backgroundColor: '#f3f4f6' }} // Fallback color
-              >
-                <source src={post.media_url} type="video/mp4" />
-              </video>
-            ) : (
-              <Image
-                src={post.media_url}
-                alt={formatCaption(post.caption)}
-                fill
-                className="object-cover transition-transform duration-500 group-hover:scale-110"
-                onError={() => setImageError(true)}
-                sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
-              />
-            )}
+            {/* Para videos, usar la thumbnail_url o media_url como imagen */}
+            <Image
+              src={post.media_type === 'VIDEO' && post.thumbnail_url ? post.thumbnail_url : post.media_url}
+              alt={formatCaption(post.caption)}
+              fill
+              className="object-cover transition-transform duration-500 group-hover:scale-110"
+              onError={() => setImageError(true)}
+              sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+            />
             
             {/* Overlay para videos */}
             {post.media_type === 'VIDEO' && (
