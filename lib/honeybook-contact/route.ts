@@ -1,4 +1,3 @@
-// app/api/honeybook-contact/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 
 interface ContactFormData {
@@ -64,10 +63,11 @@ export async function POST(request: NextRequest) {
 
     // Mapear servicios a descripción más detallada
     const serviceMapping: Record<string, string> = {
-      'dj-mc-coordination': 'DJ + MC + Wedding Coordination/Planning',
+      'dj-mc-coordination': 'DJ + MC + Wedding Coordination/Planning (Premier Package)',
       'dj-mc': 'DJ + Master of Ceremonies',
-      'coordination': 'Wedding Coordination/Planning',
-      'enhancements': 'Additional Services (Photo Booth, Officiating, Lighting, Bar Service)'
+      'coordination': 'Wedding Planning & Coordination',
+      'enhancements': 'Additional Services (Photo Booth, Officiating, Lighting)',
+      'consultation': 'Free consultation / Just browsing'
     };
 
     const serviceDescription = serviceMapping[formData.services] || formData.services || 'Not specified';
@@ -95,12 +95,15 @@ ${formData.message}
 HOW THEY HEARD ABOUT US: ${formData.howHeard || 'Not specified'}
 
 FORM SUBMISSION DATE: ${new Date().toLocaleDateString()}
+EVENT DATE: ${formData.eventDate || 'Not specified'}
+LOCATION: ${formData.location || 'Not specified'}
       `.trim(),
       source: 'PJ Parsons Website Contact Form',
       customFields: {
         servicesRequested: formData.services,
         howHeardAboutUs: formData.howHeard,
-        originalMessage: formData.message
+        originalMessage: formData.message,
+        submissionDate: new Date().toISOString()
       }
     };
 
@@ -185,34 +188,63 @@ FORM SUBMISSION DATE: ${new Date().toLocaleDateString()}
 // Función de backup por email
 async function sendEmailBackup(formData: ContactFormData) {
   try {
-    // Ejemplo simple con fetch a un servicio de email
-    // Puedes usar SendGrid, Nodemailer, etc.
-    
+    // Aquí puedes integrar con SendGrid, Resend, etc.
     const emailPayload = {
       to: 'Hello@PJParsonsPresents.com',
-      subject: `🚨 New Lead - ${formData.name} (${formData.services})`,
+      subject: `🚨 New Wedding Lead - ${formData.name} (${formData.services})`,
       html: `
-        <h2>New Contact Form Submission</h2>
-        <p><strong>⚠️ Source:</strong> Website Contact Form (HoneyBook API Issue)</p>
-        <hr>
-        <p><strong>Name:</strong> ${formData.name}</p>
-        <p><strong>Email:</strong> ${formData.email}</p>
-        <p><strong>Phone:</strong> ${formData.phone || 'Not provided'}</p>
-        <p><strong>Event Date:</strong> ${formData.eventDate || 'Not provided'}</p>
-        <p><strong>Location:</strong> ${formData.location || 'Not provided'}</p>
-        <p><strong>Services Interested:</strong> ${formData.services || 'Not specified'}</p>
-        <p><strong>How They Heard About Us:</strong> ${formData.howHeard || 'Not provided'}</p>
-        <hr>
-        <p><strong>Message:</strong></p>
-        <p style="background-color: #f5f5f5; padding: 10px; border-radius: 5px;">${formData.message}</p>
-        <hr>
-        <p><small>Submitted: ${new Date().toLocaleString()}</small></p>
-        <p><small>Please manually add this lead to HoneyBook.</small></p>
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <div style="background: linear-gradient(135deg, #E8B4BC, #C9E4DE); padding: 20px; text-align: center; color: white;">
+            <h1 style="margin: 0;">New Contact Form Submission</h1>
+            <p style="margin: 5px 0 0 0;">⚠️ Source: Website Contact Form (HoneyBook API Issue)</p>
+          </div>
+          
+          <div style="padding: 20px; background: #f9f9f9;">
+            <h2 style="color: #333; border-bottom: 2px solid #E8B4BC; padding-bottom: 10px;">Client Information</h2>
+            <p><strong>Name:</strong> ${formData.name}</p>
+            <p><strong>Email:</strong> <a href="mailto:${formData.email}">${formData.email}</a></p>
+            <p><strong>Phone:</strong> ${formData.phone || 'Not provided'}</p>
+            <p><strong>Event Date:</strong> ${formData.eventDate || 'Not provided'}</p>
+            <p><strong>Location:</strong> ${formData.location || 'Not provided'}</p>
+            <p><strong>Services Interested:</strong> ${formData.services || 'Not specified'}</p>
+            <p><strong>How They Heard About Us:</strong> ${formData.howHeard || 'Not provided'}</p>
+          </div>
+          
+          <div style="padding: 20px; background: white;">
+            <h3 style="color: #333; border-bottom: 2px solid #C9E4DE; padding-bottom: 10px;">Client Message</h3>
+            <div style="background: #f5f5f5; padding: 15px; border-radius: 5px; border-left: 4px solid #E8B4BC;">
+              ${formData.message.replace(/\n/g, '<br>')}
+            </div>
+          </div>
+          
+          <div style="padding: 20px; background: #f0f0f0; text-align: center;">
+            <p style="color: #666; font-size: 12px; margin: 0;">
+              Submitted: ${new Date().toLocaleString()}<br>
+              <strong>Action Required:</strong> Please manually add this lead to HoneyBook
+            </p>
+          </div>
+        </div>
       `
     };
 
-    // Aquí integrarías con tu servicio de email preferido
-    console.log('Would send backup email:', emailPayload);
+    // Si usas Resend (recomendado):
+    /* 
+    const response = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        from: 'website@pjparsonspresents.com',
+        to: ['Hello@PJParsonsPresents.com'],
+        subject: emailPayload.subject,
+        html: emailPayload.html,
+      }),
+    });
+    */
+
+    console.log('Would send backup email:', emailPayload.subject);
     
     return { success: true };
   } catch (error) {
