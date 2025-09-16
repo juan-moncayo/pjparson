@@ -2,50 +2,63 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Mail, Phone, MapPin, ExternalLink } from 'lucide-react';
+import { Mail, Phone, MapPin } from 'lucide-react';
+
+// Declaración de tipos directamente en el archivo
+declare global {
+  interface Window {
+    _HB_: {
+      pid?: string;
+      runSnippet?: () => void;
+      [key: string]: any;
+    };
+  }
+}
 
 export default function ContactSection() {
   const [isHoneyBookLoaded, setIsHoneyBookLoaded] = useState(false);
 
   useEffect(() => {
     // Verificar si HoneyBook ya está cargado
-    if (window._HB_) {
+    if (typeof window !== 'undefined' && window._HB_) {
       setIsHoneyBookLoaded(true);
       return;
     }
 
     // Configurar HoneyBook
-    window._HB_ = window._HB_ || {};
-    window._HB_.pid = process.env.NEXT_PUBLIC_HONEYBOOK_PLACEMENT_ID || "5e555e131a88e4001f5b189c";
+    if (typeof window !== 'undefined') {
+      window._HB_ = window._HB_ || {};
+      window._HB_.pid = process.env.NEXT_PUBLIC_HONEYBOOK_PLACEMENT_ID || "5e555e131a88e4001f5b189c";
 
-    // Cargar el script de HoneyBook si no está cargado
-    const script = document.createElement('script');
-    script.type = 'text/javascript';
-    script.async = true;
-    script.src = 'https://widget.honeybook.com/assets_users_production/websiteplacements/placement-controller.min.js';
-    
-    script.onload = () => {
-      setIsHoneyBookLoaded(true);
-      console.log('HoneyBook widget loaded successfully');
-    };
+      // Cargar el script de HoneyBook si no está cargado
+      const script = document.createElement('script');
+      script.type = 'text/javascript';
+      script.async = true;
+      script.src = 'https://widget.honeybook.com/assets_users_production/websiteplacements/placement-controller.min.js';
+      
+      script.onload = () => {
+        setIsHoneyBookLoaded(true);
+        console.log('HoneyBook widget loaded successfully');
+      };
 
-    script.onerror = () => {
-      console.error('Failed to load HoneyBook widget');
-    };
+      script.onerror = () => {
+        console.error('Failed to load HoneyBook widget');
+      };
 
-    // Insertar el script
-    const firstScript = document.getElementsByTagName('script')[0];
-    if (firstScript && firstScript.parentNode) {
-      firstScript.parentNode.insertBefore(script, firstScript);
+      // Insertar el script
+      const firstScript = document.getElementsByTagName('script')[0];
+      if (firstScript && firstScript.parentNode) {
+        firstScript.parentNode.insertBefore(script, firstScript);
+      }
+
+      // Pixel de tracking
+      const trackingPixel = document.createElement('img');
+      trackingPixel.height = 1;
+      trackingPixel.width = 1;
+      trackingPixel.style.display = 'none';
+      trackingPixel.src = `https://www.honeybook.com/p.png?pid=${window._HB_.pid}`;
+      document.head.appendChild(trackingPixel);
     }
-
-    // Pixel de tracking
-    const trackingPixel = document.createElement('img');
-    trackingPixel.height = 1;
-    trackingPixel.width = 1;
-    trackingPixel.style.display = 'none';
-    trackingPixel.src = `https://www.honeybook.com/p.png?pid=${window._HB_.pid}`;
-    document.head.appendChild(trackingPixel);
 
     return () => {
       // Cleanup si es necesario
@@ -261,15 +274,4 @@ export default function ContactSection() {
       </div>
     </section>
   );
-}
-
-// Declaración de tipos para TypeScript
-declare global {
-  interface Window {
-    _HB_: {
-      pid?: string;
-      runSnippet?: () => void;
-      [key: string]: any;
-    };
-  }
 }
