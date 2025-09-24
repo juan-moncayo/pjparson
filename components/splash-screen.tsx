@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { useEffect } from "react";
+import { motion } from "framer-motion";
 
 interface SplashScreenProps {
   onComplete: () => void;
@@ -9,10 +9,7 @@ interface SplashScreenProps {
 
 export default function SplashScreen({ onComplete }: SplashScreenProps) {
   useEffect(() => {
-    const timer = setTimeout(() => {
-      onComplete();
-    }, 2000); // 2 segundos
-    
+    const timer = setTimeout(() => onComplete(), 2000);
     return () => clearTimeout(timer);
   }, [onComplete]);
 
@@ -23,18 +20,29 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
       exit={{ opacity: 0 }}
       transition={{ duration: 1, ease: "easeInOut" }}
     >
-      {/* Video de inicio limpio */}
+      {/* Video para desktop */}
       <video
         autoPlay
         muted
         playsInline
-        className="w-full h-full object-cover"
+        className="hidden md:block w-full h-full object-cover"
         onEnded={() => onComplete()}
       >
-        <source src="/inicio.mp4" type="video/mp4" />
+        <source src="/inicio.webm" type="video/webm" />
       </video>
 
-      {/* Overlay sutil solo para transición final */}
+      {/* Video para móvil */}
+      <video
+        autoPlay
+        muted
+        playsInline
+        className="block md:hidden w-full h-full object-cover"
+        onEnded={() => onComplete()}
+      >
+        <source src="/iniciomovile.webm" type="video/webm" />
+      </video>
+
+      {/* Overlay de transición */}
       <motion.div
         className="absolute inset-0 bg-black"
         initial={{ opacity: 0 }}
